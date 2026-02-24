@@ -1,0 +1,8 @@
+"""Python library to obtain climate and air quality data from monitoring stations in Chile."""
+
+__version__ = "0.1.0"
+
+from atmchile.air_quality_data import ChileAirQuality
+from atmchile.climate_data import ChileClimateData
+
+__all__ = ["ChileClimateData", "ChileAirQuality", "__version__"]

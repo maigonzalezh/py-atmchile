@@ -1,0 +1,123 @@
+city,station_code,latitude,longitude,station_name,region,network,region_index,access_type,operator
+Alto Hospicio,RI/117,-20.290466881209,-70.100192427636,Alto Hospicio,I,Red MMA,2,Pública,Ministerio del Medio Ambiente
+Tocopilla,RII/201,-22.093082,-70.20121,Gobernación,II,Ciudad Tocopilla,3,Privada,Norgener S.A
+Mejillones,RII/209,-23.098798,-70.442765,Jardín Infantil Integra,II,Red ENAEX,3,no definida,ENAEX S.A. Planta Prillex América
+Calama,RII/217,-22.454016027306,-68.910147884933,Hospital del Cobre,II,,3,Privada,Codelco Distrito Norte
+Tocopilla,RII/230,-22.111064,-70.210828,Bomberos,II,Ciudad Tocopilla,3,Privada,Norgener S.A
+Tocopilla,RII/231,-22.060287005823,-70.187401439495,Tres Marias,II,Ciudad Tocopilla,3,Privada,Norgener S.A
+Calama,RII/233,-22.460270722943,-68.937706917007,Club Deportivo 23 de Marzo,II,Ciudad Calama,3,Privada,Codelco Distrito Norte
+Calama,RII/234,-22.464835957564,-68.920969963074,Oasis,II,,3,Privada,Codelco Distrito Norte
+Antofagasta,RII/237,-23.61354215815,-70.383315682411,Antofagasta,II,Red MMA,3,Pública,Ministerio del Medio Ambiente
+Tocopilla,RII/251,-22.085864134728,-70.188415616234,Super Site,II,Ciudad Tocopilla,3,Privada,ENGIE Energia Chile S.A.
+Calama,RII/253,-22.342971402789,-68.648661344727,Nueva ChiuChiu,II,Ciudad Calama,3,Privada,Codelco Distrito Norte
+Huasco,RIII/302,-28.461865976957,-71.181390767212,SM2,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/303,-28.471972699163,-71.178309166023,SM3 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/304,-28.481300969425,-71.167198427408,SM4 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/305,-28.484485273511,-71.146118224884,SM5 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Freirina,RIII/306,-28.503649842345,-71.126531945122,SM6 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Freirina,RIII/307,-28.497964596656,-71.096081461655,SM7 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Freirina,RIII/308,-28.507409284386,-71.081571711987,SM8 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/309,-28.470340876399,-71.218828907093,EME M,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/310,-28.466423001884,-71.221554279327,EME F,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/329,-28.466498454912,-71.230636239723,Huasco II,III,CAP - Huasco,4,Privada,Compañia Minera del Pacifico
+Copiapó,RIII/332,-27.370329154948,-70.323906678352,Copiapo Sivica,III,Red MMA,4,Pública,Ministerio del Medio Ambiente
+Huasco,RIII/333,-28.469998068842,-71.219652562817,Huasco Sivica,III,Red MMA,4,Pública,Ministerio del Medio Ambiente
+Chañaral,RIII/334,-26.335751545006,-70.612341660763,Chañaral,III,Red MMA,4,Pública,Ministerio del Medio Ambiente
+Andacollo,RIV/411,-30.255042,-71.084707,Chepiquilla,IV,Minera Teck,5,Privada,Compañía Minera Teck Carmen de Andacollo
+Andacollo,RIV/415,-30.239515,-71.085853,Urmeneta - Plaza Centenario,IV,Minera Teck,5,Privada,Compañía Minera Teck Carmen de Andacollo
+Andacollo,RIV/420,-30.227767752117,-71.086126833637,Andacollo,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
+Salamanca,RIV/424,-31.889278312544,-70.629311769684,Cuncumen ,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
+Coquimbo,RIV/425,-29.933006518748,-71.261966365967,La Serena,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
+Coquimbo,RIV/426,-29.970390235273,-71.336038250122,Coquimbo,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
+Puchuncaví,RV/501,-32.736065,-71.450827,Campiche,V,Puerto Ventanas,6,Privada,Puerto Ventanas S.A
+Puchuncaví,RV/503,-32.748154,-71.474204,La Greda,V,Complejo Industrial Ventanas,6,no definida,Codelco División Ventanas- AESGENER.S.A
+Puchuncaví,RV/504,-32.764139,-71.454494,Los Maitenes,V,Complejo Industrial Ventanas,6,no definida,Codelco División Ventanas- AESGENER.S.A
+Puchuncaví,RV/505,-32.718839486418,-71.407960598881,Puchuncaví,V,Complejo Industrial Ventanas,6,Privada,Codelco División Ventanas- AESGENER.S.A
+Quintero,RV/506,-32.801440927101,-71.484100560852,Sur,V,Complejo Industrial Ventanas,6,no definida,Codelco División Ventanas- AESGENER.S.A
+Quintero,RV/507,-32.807512,-71.436274,Valle Alegre,V,Complejo Industrial Ventanas,6,no definida,Codelco División Ventanas- AESGENER.S.A
+Concón,RV/509,-32.924568,-71.515399,Concón,V,ENAP Aconcagua,6,Privada,ENAP
+Concón,RV/511,-32.929552,-71.440571,Colmo,V,ENAP Aconcagua,6,Privada,ENAP
+Concón,RV/512,-32.915458,-71.48148,Las Gaviotas,V,ENAP Aconcagua,6,Privada,ENAP
+Quillota,RV/513,-32.885091,-71.246854,Cuerpo de Bomberos ,V,Nehuenco,6,Privada,Central Termoelectrica Nehuenco
+Quillota,RV/514,-32.937001,-71.273726,San Pedro,V,Nehuenco,6,Privada,Central Termoelectrica Nehuenco
+Quillota,RV/515,-32.891794,-71.208638,La Palma,V,Nehuenco,6,Privada,Central Termoelectrica Nehuenco
+Panquehue,RV/521,-32.797715,-70.898037,Lo Campo,V,Red Chagres,6,Privada,Fundicion Chagres de Anglo American Sur S.A.
+Catemu,RV/522,-32.779208,-70.959114,Catemu,V,Red Chagres,6,Privada,Fundicion Chagres de Anglo American Sur S.A.
+Catemu,RV/523,-32.823956,-71.006441,Romeral,V,Red Chagres,6,Privada,Fundicion Chagres de Anglo American Sur S.A.
+Catemu,RV/524,-32.776573,-70.938144,Santa Margarita,V,Red Chagres,6,Privada,Fundicion Chagres de Anglo American Sur S.A.
+Viña del Mar,RV/529,-33.020419817382,-71.550092842922,Viña del Mar,V,Red MMA,6,Pública,Ministerio del Medio Ambiente
+Los Andes,RV/532,-32.844124,-70.592135,Los Andes,V,Red MMA,6,Pública,Ministerio del Medio Ambiente
+Concón,RV/535,-32.935167,-71.52577,Junta de Vecinos,V,ENAP Aconcagua,6,Privada,ENAP
+Quintero,RV/539,-32.7877756097,-71.532282798966,Centro Quintero,V,Centro Quintero,6,Privada,GNL Quintero
+Quintero,RV/540,-32.772516452112,-71.535303287094,Quintero,V,Complejo Industrial Ventanas,6,no definida,Codelco División Ventanas- AESGENER.S.A
+Quintero,RV/547,-32.794968417299,-71.496099073086,Loncura,V,Loncura - Quintero,6,Privada,ENEL CHILE S.A.
+Puchuncaví,RV/548,-32.741815962175,-71.480882901344,Ventanas,V,,6,no definida,Codelco División Ventanas- AESGENER.S.A
+Valparaíso,RV/550,-33.049743798096,-71.614167231712,Valparaiso,V,Red MMA,6,Pública,Ministerio del Medio Ambiente
+Quilpué,RV/551,-33.047630211689,-71.438813209534,Quilpue Gimnasio,V,Red MMA,6,Pública,Ministerio del Medio Ambiente
+Concón,RV/560,-32.926114987974,-71.512123346328,Concón MMA,V,Red CQP,6,Pública,Ministerio del Medio Ambiente
+Machalí,RVI/604,-34.203524,-70.529854,Coya Población,VI,Codelco División El Teniente,8,Privada,"Codelco División El Teniente, Superintendencia Ingeniería Fundición"
+Machalí,RVI/605,-34.261909,-70.463219,Cipreses,VI,Codelco División El Teniente,8,Privada,Codelco Divsión El Teniente
+Machalí,RVI/606,-34.241168,-70.55283,Cauquenes,VI,"Red CODELCO El Teniente, Rancagua",8,Privada,Codelco Divsión El Teniente
+Rancagua,RVI/609,-34.162314609087,-70.713919225517,Rancagua I,VI,Red MMA,8,Pública,Ministerio del Medio Ambiente
+Rengo,RVI/611,-34.394541417902,-70.852981542328,Rengo,VI,Red MMA,8,Pública,Ministerio del Medio Ambiente
+San Fernando,RVI/612,-34.579759917069,-70.989685186508,San Fernando,VI,Red MMA,8,Pública,Ministerio del Medio Ambiente
+Rancagua,RVI/615,-34.143888375919,-70.737131207664,Rancagua II,VI,Red MMA,8,Pública,Ministerio del Medio Ambiente
+Talca,RVII/703,-35.435141887663,-71.678261499336,La Florida,VII,Red MMA,9,Pública,Ministerio del Medio Ambiente
+Curicó,RVII/709,-34.974925077541,-71.233967512329,Curicó,VII,Red MMA,9,Pública,Ministerio del Medio Ambiente
+Talca,RVII/710,-35.435725588722,-71.619553864003,U.C. Maule,VII,Red MMA,9,Pública,Ministerio del Medio Ambiente
+Talca,RVII/711,-35.406582744695,-71.633396474869,Universidad de Talca,VII,Red MMA,9,Pública,Ministerio del Medio Ambiente
+Linares,RVII/713,-35.836942234921,-71.592865853985,Linares,VII,Red MMA,9,Pública,Ministerio del Medio Ambiente
+Cauquenes,RVII/714,-35.969115075775,-72.316818237305,Cauquenes Sivica,VII,Red MMA,9,Pública,Ministerio del Medio Ambiente
+Talcahuano,RVIII/802,-36.723695141848,-73.123658865174,Consultorio - San Vicente,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Hualpén,RVIII/804,-36.780632,-73.115657,JUNJI,VIII,ENAP Biobío,10,Privada,ENAP
+Hualpén,RVIII/805,-36.803034,-73.120527,Bocatoma,VIII,ENAP Biobío,10,Privada,ENAP
+Talcahuano,RVIII/806,-36.737202,-73.104427,Inpesca,VIII,ENAP Biobío,10,Privada,ENAP
+Talcahuano,RVIII/807,-36.769803,-73.113708,Indura,VIII,ENAP Biobío,10,Privada,ENAP
+Chillán,RXVI/810,-36.594880886514,-72.089253650482,"INIA, Chillán",XVI,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Coronel,RVIII/816,-37.031702,-73.138689,Coronel Sur,VIII,Colbun - Coronel,10,Privada,Colbún S.A
+Nacimiento,RVIII/818,-37.501844565823,-72.676405906677,Club de Empleados,VIII,CMPC Santa Fe,10,Privada,CMPC PULP SpA
+Laja,RVIII/826,-37.267803138651,-72.710695266724,Laja,VIII,CMPC Laja,10,Privada,CMPC PULP SpA
+Concepción,RVIII/827,-36.784653741124,-73.052063025795,Kingston College,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Tomé,RVIII/830,-36.601713211434,-72.958522830688,Liceo Polivalente,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Coronel,RVIII/831,-37.021182877699,-73.149555550926,Cerro Merquín,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Curanilahue,RVIII/832,-37.485131692556,-73.331626473541,Balneario Curanilahue,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Talcahuano,RVIII/837,-36.735998,-73.118693,Nueva Libertad,VIII,CAP - Talcahuano,10,Privada,Compañía Siderurgica Huachipato
+Hualpén,RVIII/838,-36.791231,-73.119152,ENAP Price,VIII,ENAP Biobío,10,Privada,ENAP
+Hualqui,RVIII/841,-36.97743148785,-72.932017713268,Hualqui,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Nacimiento,RVIII/852,-37.503604018657,-72.6596661022,Entre Ríos,VIII,CMPC Santa Fe,10,Privada,CMPC PULP SpA
+Chiguayante,RVIII/854,-36.923329602986,-73.036132300941,Punteras,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Coronel,RVIII/859,-37.100696257418,-73.155760394707,Lota rural,VIII,ENEL Coronel,10,Privada,Enel Generacion Chile S.A.
+Coronel,RVIII/860,-37.077619809695,-73.154136498581,Lota urbana,VIII,ENEL Coronel,10,Privada,Enel Generacion Chile S.A.
+Nacimiento,RVIII/870,-37.508937992394,-72.656092617752,Lautaro,VIII,CMPC Santa Fe,10,Privada,CMPC PULP SpA
+Chillán,RXVI/873,-36.616167751711,-72.093040558483,Puren,XVI,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Los Angeles,RVIII/874,-37.463035064801,-72.324575155457,Los Ángeles Oriente,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Los Angeles,RVIII/875,-37.471182288689,-72.36146284977,21 de mayo,VIII,MMA Biobío,10,Pública,Sub Secretaría del Medio Ambiente
+Coronel,RVIII/878,-37.009021343988,-73.14909696579,Coronel Norte,VIII,Colbun - Coronel,10,Privada,Colbún S.A
+Coronel,RVIII/879,-36.984579193699,-73.152648210526,"Lagunillas, ENEL",VIII,ENEL Coronel,10,Privada,Enel Generacion Chile S.A.
+Coronel,RVIII/880,-36.954315879984,-73.150448799133,"Escuadron, ENEL",VIII,ENEL Coronel,10,Privada,Enel Generacion Chile S.A.
+Coronel,RVIII/881,-36.933633609856,-73.152701854706,"Escuadron, ENESA",VIII,"Red FPC, ENESA",10,Privada,Electrica Nueva Energia S.A.
+Temuco,RIX/901,-38.748650731093,-72.619012605804,Las Encinas Temuco,IX,Red MMA,11,Pública,Ministerio del Medio Ambiente
+Padre las Casas,RIX/902,-38.764767451719,-72.598795682209,Padre Las Casas II,IX,Red MMA,11,Pública,Ministerio del Medio Ambiente
+Temuco,RIX/905,-38.727003260042,-72.580001950264,Ñielol,IX,Red MMA,11,Pública,Ministerio del Medio Ambiente
+Villarrica,RIX/906,-39.290485097831,-72.222104072571,Villarrica,IX,Red MMA,11,Pública,Ministerio del Medio Ambiente
+Osorno,RX/A01,-40.584478665958,-73.11871982209,Osorno,X,Red MMA,13,Pública,Ministerio del Medio Ambiente
+Puerto Montt,RX/A07,-41.4795069236,-72.968755930145,Mirasol,X,,13,Pública,Ministerio del Medio Ambiente
+Puerto Montt,RX/A08,-41.399169537038,-72.899522781372,Alerce,X,Red MMA,13,Pública,Sub Secretaría del Medio Ambiente
+Puerto Varas,RX/A09,-41.328935085299,-72.968208759506,Puerto Varas,X,Red MMA,13,Pública,Sub Secretaría del Medio Ambiente
+Osorno,RX/AA2,-40.581945892399,-73.173134892662,Universidad de Los Lagos,X,Red MMA,13,Pública,Ministerio del Medio Ambiente
+Coyhaique,RXI/B03,-45.57996447948,-72.061125987766,Coyhaique,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
+Coyhaique,RXI/B04,-45.579045667164,-72.049964505825,Coyhaique II,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
+Aysén,RXI/B05,-45.40680023471,-72.696259617805,Vialidad,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
+Cochrane,RXI/B06,-47.254803255147,-72.571392059326,Cochrane,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
+Punta Arenas,RUNKNOWN/C05,-53.158295492238,-70.921497482453,Punta Arenas,UNKNOWN,Red MMA,15,Pública,Ministerio del Medio Ambiente
+La Florida,RM/D12,-33.516630362266,-70.588123961971,La Florida (Acreditada),RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Santiago,RM/D14,-33.464142,-70.660797,Parque O'Higgins,RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Pudahuel,RM/D15,-33.437811379126,-70.750171233135,Pudahuel (Acreditada),RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Cerro Navia,RM/D18,-33.433089610143,-70.732147868717,Cerro Navia,RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Puente Alto,RM/D27,-33.591390623022,-70.594788,Puente Alto,RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Talagante,RM/D28,-33.673752071375,-70.953064737434,Talagante,RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Quilicura,RM/D30,-33.349626928347,-70.723792612552,Quilicura,RM,MACAM - Metropolitana,7,Pública,Sub Secretaría del Medio Ambiente
+Cerrillos,RM/D35,-33.495361139755,-70.704821317871,Cerrillos II,RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
+Valdivia,RXIV/E03,-39.831316104673,-73.22851282209,Valdivia,XIV,Red MMA,12,Pública,Ministerio del Medio Ambiente
+La Unión,RXIV/E04,-40.286857441758,-73.076710459412,La Union,XIV,Red MMA,12,Pública,Ministerio del Medio Ambiente
+Valdivia,RXIV/E08,-39.810654596299,-73.21969804116,Valdivia 2,XIV,Red MMA,12,Pública,Ministerio del Medio Ambiente
