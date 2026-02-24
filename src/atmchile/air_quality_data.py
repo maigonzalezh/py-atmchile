@@ -602,7 +602,7 @@ class ChileAirQuality:
             parameter_results = await asyncio.gather(*parameter_tasks, return_exceptions=True)
 
         # Combine results into station DataFrame
-        for parameter, param_data in zip(parameters_list, parameter_results, strict=True):
+        for parameter, param_data in zip(parameters_list, parameter_results):
             if isinstance(param_data, Exception):
                 print(f"Error downloading {parameter} for {station_name}: {param_data}")
                 # Create empty DataFrame for this parameter
