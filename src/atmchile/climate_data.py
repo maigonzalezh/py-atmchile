@@ -470,7 +470,7 @@ class ChileClimateData:
             ]
             parameter_results = await asyncio.gather(*parameter_tasks, return_exceptions=True)
 
-        for parameter, param_df in zip(valid_params, parameter_results, strict=True):
+        for parameter, param_df in zip(valid_params, parameter_results):
             if isinstance(param_df, Exception):
                 print(f"Error downloading {parameter}: {param_df}")
                 param_df = self._create_empty_dataframe(parameter, start_datetime, end_datetime)
@@ -559,7 +559,7 @@ class ChileClimateData:
         """
         year_dataframes = []
 
-        for year, result in zip(unique_years, year_results, strict=True):
+        for year, result in zip(unique_years, year_results):
             if isinstance(result, Exception):
                 print(f"Error downloading {parameter} for year {year}: {result}")
                 year_start, year_end = self._calculate_year_bounds(
