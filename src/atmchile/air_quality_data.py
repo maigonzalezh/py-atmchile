@@ -293,6 +293,7 @@ class ChileAirQuality:
 
         search_column = "region" if region else "station_code"
 
+        assert self.stations_table is not None  # validated in _validate_and_prepare_request
         dataframes_list = []
 
         for station in stations_list:
@@ -425,6 +426,7 @@ class ChileAirQuality:
 
         search_column = "region" if region else "station_code"
 
+        assert self.stations_table is not None  # validated in _validate_and_prepare_request
         dataframes_list = []
 
         for station in stations_list:
@@ -486,7 +488,7 @@ class ChileAirQuality:
         station_code: str,
         station_name: str,
         region: str,
-        dates_str: pd.Series,
+        dates_str: pd.Index,
     ) -> pd.DataFrame:
         """
         Create a DataFrame with station metadata and dates.
@@ -496,7 +498,7 @@ class ChileAirQuality:
             station_code: Station code
             station_name: Station name
             region: Region code
-            dates_str: Series with dates formatted as strings
+            dates_str: Index with dates formatted as strings
 
         Returns:
             DataFrame with station metadata columns: date, city, station_code, station_name, region
@@ -603,7 +605,7 @@ class ChileAirQuality:
 
         # Combine results into station DataFrame
         for parameter, param_data in zip(parameters_list, parameter_results):
-            if isinstance(param_data, Exception):
+            if isinstance(param_data, BaseException):
                 print(f"Error downloading {parameter} for {station_name}: {param_data}")
                 # Create empty DataFrame for this parameter
                 param_data = self._create_empty_parameter_dataframe(
@@ -734,7 +736,7 @@ class ChileAirQuality:
             hour = time_series.str[:2]
             minute = time_series.str[2:4]
 
-            dates = day + "/" + month + "/" + year + " " + hour + ":" + minute
+            dates = day + "/" + month + "/" + year + " " + hour + ":" + minute  # type: ignore[operator]  # pandas-stubs: str + Series[str] chain
             return dates.fillna("").astype(str)
         except Exception as e:
             print(f"  Error processing date/time: {e}")
