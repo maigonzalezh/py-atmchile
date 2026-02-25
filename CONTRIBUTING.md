@@ -12,7 +12,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Clone and set up
 git clone <repository-url>
 cd atmchile
-uv sync --all-extras
+uv sync --group dev
 ```
 
 ## Running tests
@@ -60,5 +60,5 @@ CI runs both checks on every push and pull request — make sure they pass local
 
 ```bash
 uv lock --upgrade   # upgrade lock file
-uv sync --all-extras  # sync environment
+uv sync --group dev  # sync environment
 ```
