@@ -36,13 +36,6 @@ Homepage = "https://github.com/maigonzalezh/atmchile-py"
 Repository = "https://github.com/maigonzalezh/atmchile-py"
 "Bug Tracker" = "https://github.com/maigonzalezh/atmchile-py/issues"
 
-[project.optional-dependencies]
-dev = [
-    "ruff>=0.14.0",
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.1.0",
-]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/atmchile"]
@@ -107,5 +100,21 @@ exclude_lines = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.19.1",
+    "pandas-stubs>=2.2.2.240807",
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.0",
     "types-requests>=2.32.4.20250913",
 ]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
