@@ -221,6 +221,7 @@ class ChileClimateData:
 
         search_column = "Region" if region else "Código Nacional"
 
+        assert self.stations_table is not None  # validated in _validate_and_prepare_request
         # Accumulate DataFrames in a list for efficient concatenation at the end
         dataframes_list = []
 
@@ -323,6 +324,7 @@ class ChileClimateData:
 
         search_column = "Region" if region else "Código Nacional"
 
+        assert self.stations_table is not None  # validated in _validate_and_prepare_request
         dataframes_list = []
 
         for station in stations_list:
@@ -369,7 +371,7 @@ class ChileClimateData:
         station_name: str,
         latitude: float,
         longitude: float,
-        dates_str: pd.Series,
+        dates_str: pd.Index,
     ) -> pd.DataFrame:
         """
         Create a DataFrame with station information and dates.
@@ -379,7 +381,7 @@ class ChileClimateData:
             station_name: Station name
             latitude: Station latitude
             longitude: Station longitude
-            dates_str: Series with dates formatted as strings
+            dates_str: Index with dates formatted as strings
 
         Returns:
             DataFrame with station information
@@ -471,7 +473,7 @@ class ChileClimateData:
             parameter_results = await asyncio.gather(*parameter_tasks, return_exceptions=True)
 
         for parameter, param_df in zip(valid_params, parameter_results):
-            if isinstance(param_df, Exception):
+            if isinstance(param_df, BaseException):
                 print(f"Error downloading {parameter}: {param_df}")
                 param_df = self._create_empty_dataframe(parameter, start_datetime, end_datetime)
 
@@ -560,7 +562,7 @@ class ChileClimateData:
         year_dataframes = []
 
         for year, result in zip(unique_years, year_results):
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 print(f"Error downloading {parameter} for year {year}: {result}")
                 year_start, year_end = self._calculate_year_bounds(
                     year, start_datetime, end_datetime
@@ -617,7 +619,8 @@ class ChileClimateData:
                         df = df.drop(columns=["CodigoNacional"])
 
                     df["Instante"] = pd.to_datetime(df["Instante"])
-                    df = df[(df["Instante"] >= start_datetime) & (df["Instante"] <= end_datetime)]
+                    mask = (df["Instante"] >= start_datetime) & (df["Instante"] <= end_datetime)
+                    df = df[mask]  # type: ignore[assignment]  # pandas-stubs: df[bool_mask] -> DataFrame
                     return df
         except Exception:
             return None
