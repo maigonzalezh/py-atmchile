@@ -140,7 +140,7 @@ def refresh_stations() -> None:
     print(f"Timestamp: {ts}")
 
 
-def test_cov() -> None:
+def test_cov() -> None:  # pragma: no cover
     """Run tests with coverage and minimum threshold of 80%."""
     import subprocess
 
