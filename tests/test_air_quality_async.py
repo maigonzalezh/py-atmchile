@@ -915,3 +915,68 @@ def test_sync_vs_async_edge_case_region_parameter(
         sync_df_region.sort_values(by=["date", "city"]).reset_index(drop=True),
         async_df_region.sort_values(by=["date", "city"]).reset_index(drop=True),
     )
+
+
+# ---------------------------------------------------------------------------
+# Error-path coverage
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_get_data_async_handles_station_exception(
+    air_quality_instance: ChileAirQuality,
+    date_range,
+    monkeypatch,
+):
+    """Exception raised while processing a matched station is swallowed gracefully."""
+    start, end = date_range
+
+    async def always_raises(*args, **kwargs):
+        raise RuntimeError("station processing error")
+
+    monkeypatch.setattr(
+        air_quality_instance,
+        "_combine_parameters_for_station_async",
+        always_raises,
+    )
+
+    result = await air_quality_instance.get_data_async(
+        stations="RM/D14",
+        parameters="PM10",
+        start=start,
+        end=end,
+        curate=False,
+        st=False,
+    )
+
+    assert isinstance(result, pd.DataFrame)
+
+
+@pytest.mark.asyncio
+async def test_get_data_async_handles_parameter_download_exception(
+    air_quality_instance: ChileAirQuality,
+    date_range,
+    monkeypatch,
+):
+    """BaseException from a parameter download is handled and logged."""
+    start, end = date_range
+
+    async def always_raises(*args, **kwargs):
+        raise RuntimeError("download exploded")
+
+    monkeypatch.setattr(
+        air_quality_instance,
+        "_download_parameter_async",
+        always_raises,
+    )
+
+    result = await air_quality_instance.get_data_async(
+        stations="RM/D14",
+        parameters="PM10",
+        start=start,
+        end=end,
+        curate=False,
+        st=False,
+    )
+
+    assert isinstance(result, pd.DataFrame)

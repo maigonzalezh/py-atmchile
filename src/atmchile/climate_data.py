@@ -17,7 +17,7 @@ from atmchile.utils import convert_str_to_list, load_package_csv
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
-else:
+else:  # pragma: no cover
     from enum import Enum
 
     class StrEnum(str, Enum):  # type: ignore[no-redef]
@@ -502,7 +502,7 @@ class ChileClimateData:
             return df
 
         sort_columns = ["date", "CodigoNacional"] if "date" in df.columns else ["CodigoNacional"]
-        return df.sort_values(sort_columns).reset_index(drop=True)
+        return pd.DataFrame(df.sort_values(sort_columns).reset_index(drop=True))
 
     def _calculate_year_bounds(
         self, year: int, start_datetime: datetime, end_datetime: datetime

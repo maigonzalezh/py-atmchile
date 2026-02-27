@@ -703,3 +703,106 @@ def test_sync_vs_async_multiple_stations(
         sync_df.sort_values(["CodigoNacional", "date"]).reset_index(drop=True),
         async_df.sort_values(["CodigoNacional", "date"]).reset_index(drop=True),
     )
+
+
+# ---------------------------------------------------------------------------
+# Error-path coverage
+# ---------------------------------------------------------------------------
+
+
+def test_get_data_async_no_matching_stations_returns_empty(
+    climate_data_instance: ChileClimateData,
+    single_day_range,
+):
+    """get_data_async returns an empty DataFrame when no stations match the query."""
+    start, end = single_day_range
+    df = asyncio.run(
+        climate_data_instance.get_data_async(
+            stations="XV",
+            parameters="Temperatura",
+            start=start,
+            end=end,
+            region=True,
+        )
+    )
+    assert df.empty
+
+
+def test_process_year_results_returns_empty_dataframe_for_empty_input(
+    climate_data_instance: ChileClimateData,
+):
+    """_process_year_results with no years returns an empty DataFrame."""
+    start = datetime(2020, 1, 1)
+    end = datetime(2020, 1, 2)
+    result = climate_data_instance._process_year_results(
+        unique_years=[],
+        year_results=[],
+        parameter="Temperatura",
+        start_datetime=start,
+        end_datetime=end,
+    )
+    assert result.empty
+
+
+def test_combine_parameters_async_handles_parameter_exception(
+    climate_data_instance: ChileClimateData,
+    single_day_range,
+    monkeypatch,
+):
+    """BaseException from _download_parameter_async is caught and replaced with empty data."""
+    start, end = single_day_range
+
+    async def always_raises(*args, **kwargs):
+        raise RuntimeError("async download failed")
+
+    monkeypatch.setattr(climate_data_instance, "_download_parameter_async", always_raises)
+
+    result = asyncio.run(
+        climate_data_instance._combine_parameters_async(
+            parameters_list=["Temperatura"],
+            station_code="180005",
+            start_datetime=start,
+            end_datetime=end,
+        )
+    )
+
+    assert isinstance(result, pd.DataFrame)
+    assert not result.empty
+
+
+def test_process_year_data_drops_codigonacional_column(
+    climate_data_instance: ChileClimateData,
+    single_day_range,
+):
+    """_process_year_data silently removes the CodigoNacional column when present."""
+    start, end = single_day_range
+    station_code = "180005"
+    parameter = "Temperatura"
+    csvname = f"{station_code}_2020_{parameter}_.csv"
+
+    dates = pd.date_range(start, end, freq="h")
+    df_content = pd.DataFrame(
+        {
+            "CodigoNacional": [station_code] * len(dates),
+            "Instante": dates,
+            "Ts": list(range(len(dates))),
+        }
+    )
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr(
+            csvname,
+            df_content.to_csv(index=False, sep=";", decimal="."),
+        )
+
+    result = climate_data_instance._process_year_data(
+        buf.getvalue(),
+        csvname,
+        start,
+        end,
+    )
+
+    assert result is not None
+    assert "CodigoNacional" not in result.columns
+    assert "Ts" in result.columns
