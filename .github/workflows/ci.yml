@@ -33,6 +33,18 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group dev
+      - run: uv run pytest
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.9"
+      - run: uv sync --group dev
       - run: uv run pytest --cov --cov-fail-under=90
 
   audit:
@@ -63,5 +75,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          python-version: "3.11"
       - run: uv sync --group dev
       - run: uv run python -m mypy src/atmchile/
