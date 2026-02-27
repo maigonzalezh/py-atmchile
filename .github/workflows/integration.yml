@@ -1,0 +1,25 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: Python version to use
+        required: false
+        default: "3.11"
+        type: choice
+        options: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+jobs:
+  integration:
+    name: Integration Tests (Python ${{ inputs.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: ${{ inputs.python-version }}
+      - run: uv sync --group dev
+      - run: uv run pytest -m integration -v
