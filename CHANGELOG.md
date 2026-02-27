@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.0] - 2024
+## [0.1.0] - 2026-02-24
 
 ### Added
 - `ChileAirQuality`: download PM10, PM25, CO, SO2, NOX, NO2, NO, O3, temp, RH, ws, wd
@@ -22,6 +22,13 @@ All notable changes to this project will be documented in this file.
   `asyncio` + `httpx` to run multiple requests in parallel
 - **Vectorized CSV processing**: data parsing and curation use pandas column-wise operations
   (`bfill`, `pd.to_numeric`, boolean masks) instead of element-wise iteration
+
+### Testing & CI
+- 101 unit tests with 97%+ line coverage across all modules
+- Integration tests against live SINCA and DMC endpoints, marked
+  `@pytest.mark.integration` and excluded from the default run
+- Manual `workflow_dispatch` CI workflow for running integration tests
+- Mypy strict mode on source; `no-untyped-def` relaxed for test files
 
 ### Notes
 - Initial Python port of the [AtmChile R package](https://github.com/franciscoxaxo/AtmChile)

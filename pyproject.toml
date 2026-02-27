@@ -33,9 +33,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/maigonzalezh/atmchile-py"
-Repository = "https://github.com/maigonzalezh/atmchile-py"
-"Bug Tracker" = "https://github.com/maigonzalezh/atmchile-py/issues"
+Homepage = "https://github.com/maigonzalezh/py-atmchile"
+Repository = "https://github.com/maigonzalezh/py-atmchile"
+"Bug Tracker" = "https://github.com/maigonzalezh/py-atmchile/issues"
 
 
 [tool.hatch.build.targets.wheel]
