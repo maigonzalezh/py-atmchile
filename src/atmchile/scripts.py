@@ -1,9 +1,12 @@
 """Utility scripts for the atmchile project."""
 
+from __future__ import annotations
+
 import csv
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import requests
 
@@ -98,7 +101,7 @@ def refresh_stations() -> None:
         sys.exit(1)
 
     # 3. Transform
-    rows: list[dict] = []
+    rows: list[dict[str, Any]] = []
     unknown_regions: list[str] = []
 
     for s in stations_raw:
@@ -141,7 +144,7 @@ def refresh_stations() -> None:
 
 
 def test_cov() -> None:  # pragma: no cover
-    """Run tests with coverage and minimum threshold of 80%."""
+    """Run tests with coverage and minimum threshold of 90%."""
     import subprocess
 
     cmd = [
@@ -151,6 +154,6 @@ def test_cov() -> None:  # pragma: no cover
         "--cov=atmchile",
         "--cov-report=term-missing",
         "--cov-report=html",
-        "--cov-fail-under=80",
+        "--cov-fail-under=90",
     ] + sys.argv[1:]
     sys.exit(subprocess.run(cmd).returncode)
