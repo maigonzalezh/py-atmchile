@@ -1,10 +1,10 @@
 atmchile — Python port of AtmChile (R package)
-Copyright (C) 2024  Marcelo González
+Copyright (C) 2024-2026  Marcelo González
 
 This project is a Python port of the AtmChile R package by Francisco Menares et al.,
 developed at the Universidad de Chile under FONDECYT Project 1200674.
 Original repository: https://github.com/franciscoxaxo/AtmChile
-Original license: GPL-3
+Original license: GNU General Public License v3.0
 
 The initial port from R to Python was assisted by Claude (Anthropic) AI.
 
