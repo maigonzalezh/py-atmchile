@@ -20,7 +20,7 @@ if sys.version_info >= (3, 11):
 else:  # pragma: no cover
     from enum import Enum
 
-    class StrEnum(str, Enum):  # type: ignore[no-redef]
+    class StrEnum(str, Enum):
         """Backport of StrEnum for Python < 3.11."""
 
 
