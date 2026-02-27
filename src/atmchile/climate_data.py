@@ -502,7 +502,7 @@ class ChileClimateData:
             return df
 
         sort_columns = ["date", "CodigoNacional"] if "date" in df.columns else ["CodigoNacional"]
-        return df.sort_values(sort_columns).reset_index(drop=True)
+        return pd.DataFrame(df.sort_values(sort_columns).reset_index(drop=True))
 
     def _calculate_year_bounds(
         self, year: int, start_datetime: datetime, end_datetime: datetime

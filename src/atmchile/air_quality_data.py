@@ -944,7 +944,7 @@ class ChileAirQuality:
             else:
                 result_df = pd.DataFrame({"date": dates, parameter: ""})
 
-        result_df = result_df.fillna("")
+        result_df = pd.DataFrame(result_df.fillna(""))
 
         dl_col = f"dl.{parameter}"
         result_df[dl_col] = result_df[parameter].apply(
@@ -997,7 +997,7 @@ class ChileAirQuality:
         Returns:
             DataFrame with curated data
         """
-        df_curated = df.copy()
+        df_curated: pd.DataFrame = df.copy()
 
         def _mark_curated(mask: pd.Series, params: list[str]) -> None:
             """Mark dl.{param} as CURATED for rows where was previously OK, then nullify."""
