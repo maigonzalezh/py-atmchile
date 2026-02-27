@@ -1,0 +1,94 @@
+name: Refresh Stations Data
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # 00:00 UTC on the 1st of every month
+  workflow_dispatch:         # manual trigger for testing
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Fetch latest stations from SINCA
+        run: uv run refresh-stations
+        # Exits 1 on any network/HTTP/parse error → job fails → GitHub notifies by email
+
+      - name: Detect changes
+        id: check
+        run: |
+          if git diff --quiet src/atmchile/data/sinca_stations.csv; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate semantic diff
+        if: steps.check.outputs.changed == 'true'
+        id: diff
+        run: |
+          python - > diff_summary.md <<'PYEOF'
+          import csv, subprocess
+          from pathlib import Path
+
+          old_text = subprocess.check_output(
+              ['git', 'show', 'HEAD:src/atmchile/data/sinca_stations.csv'], text=True
+          )
+          old_rows = {r['station_code']: r for r in csv.DictReader(old_text.splitlines())}
+          new_rows = {r['station_code']: r for r in csv.DictReader(
+              Path('src/atmchile/data/sinca_stations.csv').read_text(encoding='utf-8').splitlines()
+          )}
+
+          added   = sorted(set(new_rows) - set(old_rows))
+          removed = sorted(set(old_rows) - set(new_rows))
+          changed = sorted(k for k in set(old_rows) & set(new_rows) if old_rows[k] != new_rows[k])
+
+          print(f"**{len(added)} added · {len(removed)} removed · {len(changed)} metadata changes**\n")
+          if added:
+              print("### Added\n" + "\n".join(f"- `{c}`" for c in added) + "\n")
+          if removed:
+              print("### Removed\n" + "\n".join(f"- `{c}`" for c in removed) + "\n")
+          if changed:
+              print("### Metadata changes\n" + "\n".join(f"- `{c}`" for c in changed) + "\n")
+          PYEOF
+
+          {
+            echo "summary<<DELIM"
+            cat diff_summary.md
+            echo "DELIM"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Ensure stations-update label exists
+        if: steps.check.outputs.changed == 'true'
+        run: gh label create "stations-update" --color "0075ca" --description "Automated station data refresh" --force
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Open PR with semantic diff
+        if: steps.check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "data: update sinca_stations.csv"
+          branch: data/refresh-stations-${{ github.run_id }}
+          title: "data: refresh sinca_stations.csv"
+          labels: stations-update
+          body: |
+            ## Station Data Update
+
+            ${{ steps.diff.outputs.summary }}
+
+            ---
+            *Automated update via [refresh-stations workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*
