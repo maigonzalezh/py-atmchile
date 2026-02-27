@@ -76,9 +76,11 @@ python_functions = ["test_*"]
 addopts = [
     "-v",
     "--strict-markers",
+    "-m", "not integration",
 ]
 markers = [
     "asyncio: marks tests as async (deselect with '-m \"not asyncio\"')",
+    "integration: marks tests that hit live external endpoints (deselect with '-m \"not integration\"')",
 ]
 
 [tool.coverage.run]
@@ -119,3 +121,8 @@ disallow_incomplete_defs = true
 check_untyped_defs = true
 no_implicit_optional = true
 strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false

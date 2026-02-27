@@ -198,6 +198,7 @@ async def test_get_data_async_concurrency_limit(air_quality_instance: ChileAirQu
 
     # Create instance with low concurrency limit
     aq = ChileAirQuality(stations_csv_path=None, max_concurrent_downloads=2)
+    assert air_quality_instance.stations_table is not None
     aq.set_stations_table(air_quality_instance.stations_table)
 
     download_count = {"value": 0}
