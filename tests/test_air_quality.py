@@ -288,7 +288,7 @@ def test_combine_parameters_merges_download_error_df(
         station_code="RM/D14",
         station_name="Santiago",
         region="RM",
-        dates_str=pd.Series(["01/01/2020 01:00"]),
+        dates_str=pd.Index(["01/01/2020 01:00"]),
     )
     result = air_quality_instance._combine_parameters_for_station(
         station_data=base_df,
@@ -413,11 +413,11 @@ def test_download_parameter_retries_after_exception(
 ):
     start, end = date_range
 
+    call_count = {"n": 0}
+
     def side_effect(*_args, **_kwargs):
-        if not hasattr(side_effect, "count"):
-            side_effect.count = 0
-        side_effect.count += 1
-        if side_effect.count == 1:
+        call_count["n"] += 1
+        if call_count["n"] == 1:
             raise requests.RequestException("boom")
         valid = "FECHA (YYMMDD);HORA (HHMM);Registros validados\n200101;0100;5\n"
         resp = MagicMock()
@@ -590,3 +590,46 @@ def test_curate_data_handles_wd_exceptions(monkeypatch, air_quality_instance: Ch
 def test_curate_data_handles_rh_exceptions(monkeypatch, air_quality_instance: ChileAirQuality):
     _patch_to_numeric(monkeypatch, {"RH"})
     air_quality_instance._curate_data(_make_exception_df())
+
+
+# ---------------------------------------------------------------------------
+# Date boundary tests (unit)
+# ---------------------------------------------------------------------------
+
+
+def test_validate_request_same_start_end(air_quality_instance: ChileAirQuality) -> None:
+    """start == end: validation passes and the date_range produces at least 1 timestamp."""
+    dt = datetime(2023, 6, 15)
+    _, _, start, end = air_quality_instance._validate_and_prepare_request(
+        stations="RM/D14", parameters="PM25", start=dt, end=dt
+    )
+    assert start == end
+    dates = pd.date_range(
+        start=start.replace(hour=1), end=end.replace(hour=23), freq="h"
+    )
+    assert len(dates) > 0
+
+
+def test_validate_request_year_boundary(air_quality_instance: ChileAirQuality) -> None:
+    """Dec→Jan crossover: validation passes and preserves distinct years."""
+    _, _, start, end = air_quality_instance._validate_and_prepare_request(
+        stations="RM/D14",
+        parameters="PM25",
+        start=datetime(2022, 12, 28),
+        end=datetime(2023, 1, 3),
+    )
+    assert start.year == 2022
+    assert end.year == 2023
+
+
+def test_validate_request_end_is_now(air_quality_instance: ChileAirQuality) -> None:
+    """end = datetime.now(): validation passes without exception."""
+    from datetime import datetime as dt_cls
+
+    _, _, start, end = air_quality_instance._validate_and_prepare_request(
+        stations="RM/D14",
+        parameters="PM25",
+        start=datetime(2024, 1, 1),
+        end=dt_cls.now(),
+    )
+    assert end >= start

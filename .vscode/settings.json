@@ -27,7 +27,7 @@
     "ruff.lint.enable": true,
     "ruff.format.enable": true,
     "ruff.executablePath": "${workspaceFolder}/.venv/bin/ruff",
-    "mypy-type-checker.importStrategy": "off",
+    "mypy-type-checker.importStrategy": "fromEnvironment",
     "python.linting.enabled": false,
     "python.linting.mypyEnabled": false
 }

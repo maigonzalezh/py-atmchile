@@ -28,7 +28,7 @@ def _build_zip_bytes(
     if dates.empty:
         dates = pd.date_range(datetime(year, 1, 1), periods=1, freq="h")
 
-    data: dict[str, list] = {"Instante": dates}
+    data: dict[str, list] = {"Instante": list(dates)}
 
     if parameter == "Temperatura":
         data["Ts"] = list(range(len(dates)))
@@ -107,6 +107,7 @@ def test_init_with_custom_csv(tmp_path, mock_stations_df: pd.DataFrame):
     mock_stations_df.to_csv(csv_file, index=False)
 
     ccd = ChileClimateData(stations_csv_path=str(csv_file))
+    assert ccd.stations_table is not None
     actual = ccd.stations_table.copy()
     actual["Código Nacional"] = actual["Código Nacional"].astype(str)
     pd.testing.assert_frame_equal(
@@ -422,7 +423,7 @@ def test_create_empty_dataframe_shapes_match_parameter(
 
 
 def test_create_station_dataframe_sets_datetime(climate_data_instance: ChileClimateData):
-    dates = pd.Series(["01-01-2020 00:00:00", "01-01-2020 01:00:00"])
+    dates = pd.Index(["01-01-2020 00:00:00", "01-01-2020 01:00:00"])
     df = climate_data_instance._create_station_dataframe(
         station_code="180005",
         station_name="Estación A",
@@ -596,7 +597,7 @@ def test_download_year_async_returns_none_on_http_error(
     async def run():
         semaphore = asyncio.Semaphore(1)
         return await climate_data_instance._download_year_async(
-            client=FailingClient(),
+            client=FailingClient(),  # type: ignore[arg-type]
             semaphore=semaphore,
             station_code="180005",
             parameter="Temperatura",
@@ -806,3 +807,43 @@ def test_process_year_data_drops_codigonacional_column(
     assert result is not None
     assert "CodigoNacional" not in result.columns
     assert "Ts" in result.columns
+
+
+# ---------------------------------------------------------------------------
+# Date boundary tests (unit)
+# ---------------------------------------------------------------------------
+
+
+def test_validate_request_four_year_window(climate_data_instance: ChileClimateData) -> None:
+    """4-year window: validation passes and year difference is preserved."""
+    _, _, start, end = climate_data_instance._validate_and_prepare_request(
+        stations="330019",
+        parameters="Temperatura",
+        start=datetime(2022, 1, 1),
+        end=datetime(2026, 1, 1),
+    )
+    assert end.year - start.year == 4
+
+
+def test_validate_request_leap_year_feb29(climate_data_instance: ChileClimateData) -> None:
+    """Feb 29 in a leap year: validation passes without exception."""
+    _, _, start, end = climate_data_instance._validate_and_prepare_request(
+        stations="330019",
+        parameters="Temperatura",
+        start=datetime(2024, 2, 29),
+        end=datetime(2024, 3, 1),
+    )
+    assert start.month == 2 and start.day == 29
+
+
+def test_validate_request_end_is_now(climate_data_instance: ChileClimateData) -> None:
+    """end = datetime.now(): validation passes without exception."""
+    from datetime import datetime as dt_cls
+
+    _, _, start, end = climate_data_instance._validate_and_prepare_request(
+        stations="330019",
+        parameters="Temperatura",
+        start=datetime(2025, 1, 1),
+        end=dt_cls.now(),
+    )
+    assert end >= start
