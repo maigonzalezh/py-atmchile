@@ -279,6 +279,18 @@ class ChileAirQuality:
         Raises:
             ValueError: If the stations table has not been loaded or if dates
                        are invalid.
+
+        Note:
+            Network failures: if SINCA is unreachable or returns an HTTP error for a
+            given parameter, no exception is raised. The affected parameter columns
+            will contain NaN and the corresponding ``dl.{parameter}`` column will be
+            ``AirQualityDownloadStatus.DOWNLOAD_ERROR``. Two URL variants are tried
+            before marking a download as failed.
+
+            Station-level errors: if an unexpected error occurs while processing a
+            station (e.g. a missing column in the stations table), that station is
+            skipped with a warning and the remaining ones are still processed. This
+            method never raises beyond ``ValueError``.
         """
         stations_list, parameters_list, start_datetime, end_datetime = (
             self._validate_and_prepare_request(stations, parameters, start, end)
@@ -412,6 +424,18 @@ class ChileAirQuality:
         Raises:
             ValueError: If the stations table has not been loaded or if dates
                        are invalid.
+
+        Note:
+            Network failures: if SINCA is unreachable or returns an HTTP error for a
+            given parameter, no exception is raised. The affected parameter columns
+            will contain NaN and the corresponding ``dl.{parameter}`` column will be
+            ``AirQualityDownloadStatus.DOWNLOAD_ERROR``. Two URL variants are tried
+            before marking a download as failed.
+
+            Station-level errors: if an unexpected error occurs while processing a
+            station (e.g. a missing column in the stations table), that station is
+            skipped with a warning and the remaining ones are still processed. This
+            method never raises beyond ``ValueError``.
         """
         stations_list, parameters_list, start_datetime, end_datetime = (
             self._validate_and_prepare_request(stations, parameters, start, end)
@@ -736,7 +760,9 @@ class ChileAirQuality:
             hour = time_series.str[:2]
             minute = time_series.str[2:4]
 
-            dates = day + "/" + month + "/" + year + " " + hour + ":" + minute  # type: ignore[operator]  # pandas-stubs: str + Series[str] chain
+            date_part = day.str.cat([month, year], sep="/")
+            time_part = hour.str.cat([minute], sep=":")
+            dates = date_part.str.cat([time_part], sep=" ")
             return dates.fillna("").astype(str)
         except Exception as e:
             print(f"  Error processing date/time: {e}")
