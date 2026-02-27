@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -9,18 +10,17 @@ import requests as req
 
 from atmchile.scripts import _build_station_code, refresh_stations
 
-
 # ---------------------------------------------------------------------------
 # _build_station_code (pure function)
 # ---------------------------------------------------------------------------
 
 
-def test_build_station_code_regular_region():
+def test_build_station_code_regular_region() -> None:
     """Non-RM regions get an 'R' prefix."""
     assert _build_station_code("IV", "001") == "RIV/001"
 
 
-def test_build_station_code_rm():
+def test_build_station_code_rm() -> None:
     """RM is used directly without an 'R' prefix."""
     assert _build_station_code("RM", "D14") == "RM/D14"
 
@@ -31,7 +31,9 @@ def test_build_station_code_rm():
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_writes_csv(mock_get, tmp_path, monkeypatch):
+def test_refresh_stations_writes_csv(
+    mock_get: MagicMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Happy path: valid JSON response causes a CSV to be written."""
     monkeypatch.setattr("atmchile.scripts.DATA_DIR", tmp_path)
     mock_get.return_value.json.return_value = [
@@ -58,7 +60,9 @@ def test_refresh_stations_writes_csv(mock_get, tmp_path, monkeypatch):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_connection_error_exits(mock_get, capsys):
+def test_refresh_stations_connection_error_exits(
+    mock_get: MagicMock, capsys: pytest.CaptureFixture[str]
+) -> None:
     """ConnectionError triggers sys.exit(1) with a descriptive message."""
     mock_get.side_effect = req.exceptions.ConnectionError("no route to host")
     with pytest.raises(SystemExit) as exc:
@@ -68,7 +72,7 @@ def test_refresh_stations_connection_error_exits(mock_get, capsys):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_timeout_exits(mock_get):
+def test_refresh_stations_timeout_exits(mock_get: MagicMock) -> None:
     """Timeout triggers sys.exit(1)."""
     mock_get.side_effect = req.exceptions.Timeout()
     with pytest.raises(SystemExit) as exc:
@@ -77,7 +81,7 @@ def test_refresh_stations_timeout_exits(mock_get):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_http_error_exits(mock_get):
+def test_refresh_stations_http_error_exits(mock_get: MagicMock) -> None:
     """HTTPError triggers sys.exit(1)."""
     http_err = req.exceptions.HTTPError()
     http_err.response = MagicMock()
@@ -89,7 +93,7 @@ def test_refresh_stations_http_error_exits(mock_get):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_generic_request_exception_exits(mock_get):
+def test_refresh_stations_generic_request_exception_exits(mock_get: MagicMock) -> None:
     """Generic RequestException triggers sys.exit(1)."""
     mock_get.side_effect = req.exceptions.RequestException("boom")
     with pytest.raises(SystemExit) as exc:
@@ -103,7 +107,7 @@ def test_refresh_stations_generic_request_exception_exits(mock_get):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_invalid_json_exits(mock_get):
+def test_refresh_stations_invalid_json_exits(mock_get: MagicMock) -> None:
     """Un-parseable JSON response triggers sys.exit(1)."""
     mock_get.return_value.json.side_effect = ValueError("not JSON")
     with pytest.raises(SystemExit) as exc:
@@ -112,7 +116,7 @@ def test_refresh_stations_invalid_json_exits(mock_get):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_non_list_response_exits(mock_get):
+def test_refresh_stations_non_list_response_exits(mock_get: MagicMock) -> None:
     """A JSON object (not a list) at the top level triggers sys.exit(1)."""
     mock_get.return_value.json.return_value = {"error": "unexpected"}
     with pytest.raises(SystemExit) as exc:
@@ -126,7 +130,12 @@ def test_refresh_stations_non_list_response_exits(mock_get):
 
 
 @patch("atmchile.scripts.requests.get")
-def test_refresh_stations_unknown_region_warns(mock_get, tmp_path, monkeypatch, capsys):
+def test_refresh_stations_unknown_region_warns(
+    mock_get: MagicMock,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """An unrecognised region string prints a WARNING but does not exit."""
     monkeypatch.setattr("atmchile.scripts.DATA_DIR", tmp_path)
     mock_get.return_value.json.return_value = [
