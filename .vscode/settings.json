@@ -21,6 +21,7 @@
         "editor.defaultFormatter": "charliermarsh.ruff",
     },
     "ruff.enable": true,
+    "ruff.configurationPreference": "filesystemFirst",
     "ruff.server.enable": true,
     "ruff.organizeImports": true,
     "ruff.lint.enable": true,
