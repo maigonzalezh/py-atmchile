@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import io
+import logging
 import os
 import sys
 import zipfile
@@ -14,6 +15,8 @@ import pandas as pd
 import requests
 
 from atmchile.utils import convert_str_to_list, load_package_csv
+
+logger = logging.getLogger(__name__)
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -231,31 +234,35 @@ class ChileClimateData:
             ]
 
             for _, station_row in matching_stations.iterrows():
-                station_code = station_row["Código Nacional"]
-                station_name = station_row["Nombre"]
-                latitude = station_row["Latitud"]
-                longitude = station_row["Longitud"]
+                try:
+                    station_code = station_row["Código Nacional"]
+                    station_name = station_row["Nombre"]
+                    latitude = station_row["Latitud"]
+                    longitude = station_row["Longitud"]
 
-                station_data = self._create_station_dataframe(
-                    station_code, station_name, latitude, longitude, dates_str
-                )
+                    station_data = self._create_station_dataframe(
+                        station_code, station_name, latitude, longitude, dates_str
+                    )
 
-                combined_param_df = self._combine_parameters(
-                    parameters_list,
-                    station_code,
-                    start_datetime,
-                    end_datetime,
-                    self._download_parameter,
-                )
+                    combined_param_df = self._combine_parameters(
+                        parameters_list,
+                        station_code,
+                        start_datetime,
+                        end_datetime,
+                        self._download_parameter,
+                    )
 
-                combined_params_with_station_data = pd.merge(
-                    combined_param_df,
-                    station_data,
-                    left_on="date",
-                    right_on="date",
-                    how="left",
-                )
-                dataframes_list.append(combined_params_with_station_data)
+                    combined_params_with_station_data = pd.merge(
+                        combined_param_df,
+                        station_data,
+                        left_on="date",
+                        right_on="date",
+                        how="left",
+                    )
+                    dataframes_list.append(combined_params_with_station_data)
+                except Exception as e:
+                    logger.warning("Error processing station %s: %s", station, e)
+                    continue
 
         if dataframes_list:
             total_data = pd.concat(dataframes_list, ignore_index=True)
@@ -333,30 +340,34 @@ class ChileClimateData:
             ]
 
             for _, station_row in matching_stations.iterrows():
-                station_code = station_row["Código Nacional"]
-                station_name = station_row["Nombre"]
-                latitude = station_row["Latitud"]
-                longitude = station_row["Longitud"]
+                try:
+                    station_code = station_row["Código Nacional"]
+                    station_name = station_row["Nombre"]
+                    latitude = station_row["Latitud"]
+                    longitude = station_row["Longitud"]
 
-                station_data = self._create_station_dataframe(
-                    station_code, station_name, latitude, longitude, dates_str
-                )
+                    station_data = self._create_station_dataframe(
+                        station_code, station_name, latitude, longitude, dates_str
+                    )
 
-                combined_param_df = await self._combine_parameters_async(
-                    parameters_list,
-                    station_code,
-                    start_datetime,
-                    end_datetime,
-                )
+                    combined_param_df = await self._combine_parameters_async(
+                        parameters_list,
+                        station_code,
+                        start_datetime,
+                        end_datetime,
+                    )
 
-                combined_params_with_station_data = pd.merge(
-                    combined_param_df,
-                    station_data,
-                    left_on="date",
-                    right_on="date",
-                    how="left",
-                )
-                dataframes_list.append(combined_params_with_station_data)
+                    combined_params_with_station_data = pd.merge(
+                        combined_param_df,
+                        station_data,
+                        left_on="date",
+                        right_on="date",
+                        how="left",
+                    )
+                    dataframes_list.append(combined_params_with_station_data)
+                except Exception as e:
+                    logger.warning("Error processing station %s: %s", station, e)
+                    continue
 
         if dataframes_list:
             total_data = pd.concat(dataframes_list, ignore_index=True)
@@ -474,7 +485,7 @@ class ChileClimateData:
 
         for parameter, param_df in zip(valid_params, parameter_results):
             if isinstance(param_df, BaseException):
-                print(f"Error downloading {parameter}: {param_df}")
+                logger.warning("Error downloading %s: %s", parameter, param_df)
                 param_df = self._create_empty_dataframe(parameter, start_datetime, end_datetime)
 
             combined_param_df = pd.merge(
@@ -563,7 +574,7 @@ class ChileClimateData:
 
         for year, result in zip(unique_years, year_results):
             if isinstance(result, BaseException):
-                print(f"Error downloading {parameter} for year {year}: {result}")
+                logger.warning("Error downloading %s for year %d: %s", parameter, year, result)
                 year_start, year_end = self._calculate_year_bounds(
                     year, start_datetime, end_datetime
                 )
@@ -572,7 +583,9 @@ class ChileClimateData:
             elif result is not None:
                 year_dataframes.append(result)
             else:
-                print(f"Error downloading {parameter} for year {year}: Error processing data")
+                logger.warning(
+                    "Error downloading %s for year %d: Error processing data", parameter, year
+                )
                 year_start, year_end = self._calculate_year_bounds(
                     year, start_datetime, end_datetime
                 )
@@ -622,7 +635,8 @@ class ChileClimateData:
                     mask = (df["Instante"] >= start_datetime) & (df["Instante"] <= end_datetime)
                     df = df[mask]  # type: ignore[assignment]  # pandas-stubs: df[bool_mask] -> DataFrame
                     return df
-        except Exception:
+        except Exception as e:
+            logger.warning("Error processing %s: %s", csvname, e)
             return None
 
     def _download_parameter(
@@ -656,29 +670,32 @@ class ChileClimateData:
 
         for year in unique_years:
             url, csvname = self._build_download_urls(station_code, year, parameter)
-            print("File URL", url)
+            logger.debug("File URL %s", url)
 
             try:
                 response = requests.get(url, timeout=30)
                 response.raise_for_status()
-
-                df = self._process_year_data(
-                    response.content, csvname, start_datetime, end_datetime
-                )
-
-                if df is not None:
-                    df = self._add_status_columns(df)
-                    year_dataframes.append(df)
-                else:
-                    raise ValueError("Error processing data")
-
-            except Exception as e:
-                print(f"Error downloading {parameter} for year {year}: {e}")
+            except requests.RequestException as e:
+                logger.warning("Error downloading %s for year %d: %s", parameter, year, e)
                 year_start, year_end = self._calculate_year_bounds(
                     year, start_datetime, end_datetime
                 )
-                empty_df = self._create_empty_dataframe(parameter, year_start, year_end)
-                year_dataframes.append(empty_df)
+                year_dataframes.append(
+                    self._create_empty_dataframe(parameter, year_start, year_end)
+                )
+                continue
+
+            df = self._process_year_data(response.content, csvname, start_datetime, end_datetime)
+            if df is not None:
+                year_dataframes.append(self._add_status_columns(df))
+            else:
+                logger.warning("Failed to parse %s data for year %d", parameter, year)
+                year_start, year_end = self._calculate_year_bounds(
+                    year, start_datetime, end_datetime
+                )
+                year_dataframes.append(
+                    self._create_empty_dataframe(parameter, year_start, year_end)
+                )
 
         if year_dataframes:
             combined_df = pd.concat(year_dataframes, ignore_index=True)
@@ -718,7 +735,7 @@ class ChileClimateData:
         """
         async with semaphore:
             url, csvname = self._build_download_urls(station_code, year, parameter)
-            print("File URL", url)
+            logger.debug("File URL %s", url)
 
             try:
                 response = await client.get(url)
@@ -732,7 +749,7 @@ class ChileClimateData:
                 return df
 
             except Exception as e:
-                print(f"Error downloading {parameter} for year {year}: {e}")
+                logger.warning("Error downloading %s for year %d: %s", parameter, year, e)
                 return None
 
     async def _download_parameter_async(
