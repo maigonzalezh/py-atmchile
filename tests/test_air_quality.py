@@ -604,9 +604,7 @@ def test_validate_request_same_start_end(air_quality_instance: ChileAirQuality) 
         stations="RM/D14", parameters="PM25", start=dt, end=dt
     )
     assert start == end
-    dates = pd.date_range(
-        start=start.replace(hour=1), end=end.replace(hour=23), freq="h"
-    )
+    dates = pd.date_range(start=start.replace(hour=1), end=end.replace(hour=23), freq="h")
     assert len(dates) > 0
 
 
