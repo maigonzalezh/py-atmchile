@@ -1,197 +1,36 @@
 # atmchile
 
-Python library to download air quality and climate data from Chilean government monitoring networks.
+![CI](https://github.com/maigonzalezh/py-atmchile/actions/workflows/ci.yml/badge.svg)
+[![PyPI](https://img.shields.io/pypi/v/atmchile)](https://pypi.org/project/atmchile/)
+[![Python](https://img.shields.io/pypi/pyversions/atmchile)](https://pypi.org/project/atmchile/)
 
-## Description
+Python library to download air quality and climate data from two Chilean government monitoring
+networks: **SINCA** (Sistema de Información Nacional de Calidad del Aire), operated by the
+Ministry of Environment of Chile (MMA — Ministerio del Medio Ambiente), and **DMC**
+(Dirección Meteorológica de Chile). Both modules return tidy pandas DataFrames with
+download-lineage columns, and support synchronous and asynchronous bulk downloads.
 
-**atmchile** provides programmatic access to two national Chilean environmental
-monitoring systems: SINCA (air quality) and DMC (climate). Both modules return
-tidy pandas DataFrames annotated with download-lineage columns, and support
-synchronous and asynchronous bulk downloads. Compared to the original R
-implementation — which uses sequential `for` loops and processes each CSV
-row-by-row — this port adds two performance improvements: **asynchronous
-concurrent downloads** (`asyncio` + `httpx`) and **vectorized CSV processing**
-via pandas (column-wise operations instead of element-wise iteration).
-
-## Data Sources
-
-### SINCA — air quality
-
-[SINCA](https://sinca.mma.gob.cl/) (Sistema de Información Nacional de Calidad
-del Aire) is Chile's national air quality monitoring network, operated by the
-Ministry of Environment (MMA). It covers 120+ stations distributed across the
-country's administrative regions, measuring hourly concentrations of criteria
-pollutants and meteorological variables.
-
-#### SINCA internals
-
-[SINCA (Sistema de Información Nacional de Calidad del Aire)](https://sinca.mma.gob.cl/)
-is Chile's national air quality monitoring system, managed by the Ministry of
-Environment (MMA).
-
-##### Backend architecture
-
-SINCA runs on **Airviro**, a commercial air quality monitoring platform developed by
-IVL Swedish Environmental Research Institute (Sweden). The backend is a CGI-based
-system running on Apache/Linux, with data stored in a structured filesystem:
-
-```
-/usr/airviro/data/CONAMA/
-└── {REGION}/{STATION_KEY}/
-    ├── Cal/    # Calibrated pollutant measurements
-    └── Met/    # Meteorological measurements
-```
-
-##### Station metadata discovery
-
-SINCA does not expose a documented public API. The station list is loaded dynamically
-by the interactive map at `https://sinca.mma.gob.cl/mapainteractivo/index.html`.
-Inspecting the network traffic in browser DevTools while loading that page reveals the
-JavaScript bundle `mapa.js`, which hardcodes the station list endpoint:
-
-```javascript
-// mapa.js
-var g = { listado: "//sinca.mma.gob.cl/index.php/json/listadomapa2k19/" };
-```
-
-This endpoint returns a JSON array where each object represents a station:
-
-```json
-{
-  "nombre":      "Alto Hospicio",
-  "key":         "117",
-  "latitud":     -20.290466881209,
-  "longitud":    -70.100192427636,
-  "comuna":      "Alto Hospicio",
-  "red":         "Red MMA",
-  "region":      "Región de Tarapacá",
-  "regionindex": 2,
-  "calificacion": "Pública",
-  "empresa":     "Ministerio del Medio Ambiente",
-  "realtime":    [...]
-}
-```
-
-The `realtime` array contains the last 24 hours of readings and is not used for
-station metadata. The fields retained in `sinca_stations.csv` are:
-
-| JSON field | CSV column | Description |
-|---|---|---|
-| `nombre` | `station_name` | Human-readable station name |
-| `key` | `station_code` | Unique station identifier used in download URLs |
-| `latitud` | `latitude` | WGS84 latitude |
-| `longitud` | `longitude` | WGS84 longitude |
-| `comuna` | `city` | Municipality |
-| `region` | `region` | Administrative region (roman numeral: `I`, `II`, ... `RM`) |
-| `red` | `network` | Monitoring network name |
-| `regionindex` | `region_index` | Numeric region index |
-| `calificacion` | `access_type` | Access classification (`Pública` / `Privada`) |
-| `empresa` | `operator` | Operating organization |
-
-##### Parameter code discovery
-
-The same `mapa.js` reveals the parameter codes used throughout SINCA, hardcoded in a
-`switch` statement that maps internal codes to display labels:
-
-```javascript
-switch (e.realtime[T].code) {
-  case "PM10":  B = "MP 10";                break;
-  case "PM25":  B = "MP 2.5";              break;
-  case "0001":  B = "Dióxido de azufre";   break;
-  case "0003":  B = "Dióxido de nitrógeno"; break;
-  case "0004":  B = "Monóxido de carbono"; break;
-  case "0008":  B = "Ozono";               break;
-}
-```
-
-These codes map directly to filesystem paths in the download endpoint. Meteorological
-parameters (`temp`, `RH`, `ws`, `wd`) do not appear in `mapa.js` — their paths were
-discovered empirically by probing the CGI endpoint.
-
-##### Data download endpoint
-
-All historical data is served by a single public CGI endpoint with no authentication
-required. The URL is constructed as:
-
-```
-https://sinca.mma.gob.cl/cgi-bin/APUB-MMA/apub.tsindico2.cgi
-  ?outtype=xcl
-  &macro=./{STATION_CODE}{PARAMETER_PATH}from={YYMMDD}&to={YYMMDD}
-  &path=/usr/airviro/data/CONAMA/
-  &lang=esp&rsrc=&macropath=
-```
-
-The full set of parameter paths, as used by this library:
-
-| Parameter | Type | Path |
-|---|---|---|
-| `PM10` | Pollutant | `/Cal/PM10//PM10.horario.horario.ic&` |
-| `PM25` | Pollutant | `/Cal/PM25//PM25.horario.horario.ic&` |
-| `SO2` | Pollutant | `/Cal/0001//0001.horario.horario.ic&` |
-| `NO` | Pollutant | `/Cal/0002//0002.horario.horario.ic&` |
-| `NO2` | Pollutant | `/Cal/0003//0003.horario.horario.ic&` |
-| `CO` | Pollutant | `/Cal/0004//0004.horario.horario.ic&` |
-| `O3` | Pollutant | `/Cal/0008//0008.horario.horario.ic&` |
-| `NOX` | Pollutant | `/Cal/0NOX//0NOX.horario.horario.ic&` |
-| `temp` | Meteorological | `/Met/TEMP//horario_000.ic&` (alt: `horario_010.ic&`) |
-| `RH` | Meteorological | `/Met/RHUM//horario_000.ic&` (alt: `horario_002.ic&`) |
-| `ws` | Meteorological | `/Met/WSPD//horario_000.ic&` (alt: `horario_010.ic&`) |
-| `wd` | Meteorological | `/Met/WDIR//horario_000_spec.ic&` (alt: `horario_010_spec.ic&`) |
-
-Meteorological parameters have an alternative path tried automatically when the
-primary returns no data. The date parameters use 6-digit format: `YYMMDD` (e.g.,
-`200101` for January 1st, 2020).
-
-**Example** — PM10 from Parque O'Higgins (`RM/D14`), January 2020:
-
-```
-https://sinca.mma.gob.cl/cgi-bin/APUB-MMA/apub.tsindico2.cgi?outtype=xcl&macro=./RM/D14/Cal/PM10//PM10.horario.horario.ic&from=200101&to=200131&path=/usr/airviro/data/CONAMA/&lang=esp&rsrc=&macropath=
-```
-
-##### Response format
-
-The endpoint returns a semicolon-delimited CSV with hourly records and three
-validation columns in priority order:
-
-| Column | Description |
-|---|---|
-| `FECHA (YYMMDD)` | Date in `YYMMDD` format |
-| `HORA (HHMM)` | Time in `HHMM` format |
-| `Registros validados` | Operationally validated values (highest priority) |
-| `Registros preliminares` | Preliminary values |
-| `Registros no validados` | Raw, unvalidated values (lowest priority) |
-
-The library coalesces these three columns left-to-right, taking the first non-null
-value per row.
-
-##### Station metadata (`sinca_stations.csv`)
-
-The file `src/atmchile/data/sinca_stations.csv` is the **source of truth** for SINCA
-station metadata used by this library. It contains 118 stations across 22 monitoring
-networks, with columns: `city`, `station_code`, `latitude`, `longitude`,
-`station_name`, `region`, `network`, `region_index`, `access_type`, `operator`.
-
-This file is kept up to date by running:
+## Installation
 
 ```bash
-uv run refresh-stations
+pip install atmchile
 ```
 
-That command fetches the live `listadomapa2k19` endpoint, transforms the JSON in
-memory, and overwrites the CSV — no intermediate file is written to disk. See
-[Refresh station metadata](#refresh-station-metadata) under Development for details.
+## Quick Start
 
-> **Note:** The endpoint name (`listadomapa2k19`) and the parameter codes were
-> discovered via source inspection and are not officially documented by MMA. Both
-> are subject to change in future SINCA updates.
+```python
+from datetime import datetime
+from atmchile import ChileAirQuality
 
-### DMC — climate
-
-[DMC](https://climatologia.meteochile.gob.cl/) (Dirección Meteorológica de
-Chile) is Chile's national weather service, operated by the Dirección General
-de Aeronáutica Civil (DGAC). It provides synoptic climate observations
-(temperature, dew point, humidity, wind, surface and sea-level pressure) from
-stations nationwide.
+caq = ChileAirQuality()
+df = caq.get_data(
+    stations="El Bosque",
+    parameters=["PM10", "PM25"],
+    start=datetime(2020, 1, 1),
+    end=datetime(2020, 1, 31),
+)
+print(df.head())
+```
 
 ## Available Parameters
 
@@ -212,6 +51,8 @@ stations nationwide.
 | `ws` | Wind speed | m/s |
 | `wd` | Wind direction (meteorological convention) | ° |
 
+> Units: **µg/m³N** = micrograms per normal cubic metre (0 °C, 1 atm); **ppb** = parts per billion by volume.
+
 ### ChileClimateData (DMC)
 
 | Parameter | Description | Output column(s) | Unit |
@@ -223,71 +64,6 @@ stations nationwide.
 | `PresionQFE` | Station-level pressure (QFE) | `QFE` | hPa |
 | `PresionQFF` | Sea-level pressure (QFF) | `QFF` | hPa |
 
-## Installation
-
-### Requirements
-
-- Python >= 3.9
-- [uv](https://github.com/astral-sh/uv)
-
-### Setup
-
-#### 1. Install uv
-
-If you don't have `uv` installed:
-
-```bash
-# macOS and Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Or using pip
-pip install uv
-```
-
-#### 2. Clone the repository
-
-```bash
-git clone <repository-url>
-cd atmchile
-```
-
-#### 3. Set up virtual environment and install dependencies
-
-```bash
-# Install all dependencies (including development dependencies)
-uv sync --all-extras
-
-# Or only development dependencies
-uv sync --extra dev
-```
-
-This will create a virtual environment in `.venv/` and install:
-- **Main dependencies**: numpy, pandas, requests, httpx
-- **Development dependencies**: ruff, pytest, pytest-asyncio, pytest-cov
-
-#### 4. Verify installation
-
-```bash
-# Verify that the environment is active and dependencies are installed
-uv run python -c "from atmchile import ChileClimateData; print('✓ Installation successful')"
-```
-
-## Quick Start
-
-```python
-from datetime import datetime
-from atmchile import ChileAirQuality
-
-caq = ChileAirQuality()
-df = caq.get_data(
-    stations="El Bosque",
-    parameters=["PM10", "PM25"],
-    start=datetime(2020, 1, 1),
-    end=datetime(2020, 1, 31),
-)
-print(df.head())
-```
-
 ## Usage
 
 ### ChileAirQuality
@@ -296,17 +72,14 @@ print(df.head())
 from datetime import datetime
 from atmchile import ChileAirQuality
 
-# Create instance
 caq = ChileAirQuality()
 
-# Get air quality data
 data = caq.get_data(
     stations="El Bosque",
     parameters=["PM10", "PM25"],
     start=datetime(2020, 1, 1),
     end=datetime(2020, 1, 2),
 )
-
 print(data)
 ```
 
@@ -325,7 +98,6 @@ async def main():
         end=datetime(2021, 12, 31),
         region=True,
     )
-
     print(data)
 
 asyncio.run(main())
@@ -337,17 +109,14 @@ asyncio.run(main())
 from datetime import datetime
 from atmchile import ChileClimateData
 
-# Create instance
 ccd = ChileClimateData()
 
-# Get data synchronously
 data = ccd.get_data(
     stations="180005",
     parameters=["Temperatura", "Humedad"],
     start=datetime(2020, 1, 1, 0, 0, 0),
     end=datetime(2020, 12, 31, 23, 0, 0),
 )
-
 print(data)
 ```
 
@@ -366,7 +135,6 @@ async def main():
         end=datetime(2021, 12, 31, 23, 0, 0),
         region=True,
     )
-
     print(data)
 
 asyncio.run(main())
@@ -432,6 +200,16 @@ For each output column `{col}` (e.g. `Ts`, `HR`, `dd`, `ff`):
 
 > `ChileClimateData` does not apply curation rules — there is no `curated` status for this class.
 
+## Data Sources
+
+### SINCA — air quality
+
+[SINCA](https://sinca.mma.gob.cl/) (Sistema de Información Nacional de Calidad del Aire) is Chile's national air quality monitoring network, operated by the Ministry of Environment (MMA). It covers 120+ stations distributed across the country's administrative regions, measuring hourly concentrations of criteria pollutants and meteorological variables.
+
+### DMC — climate
+
+[DMC](https://climatologia.meteochile.gob.cl/) (Dirección Meteorológica de Chile) is Chile's national weather service, operated by the Dirección General de Aeronáutica Civil (DGAC). It provides synoptic climate observations (temperature, dew point, humidity, wind, surface and sea-level pressure) from stations nationwide.
+
 ## Development
 
 ### Run tests
@@ -443,29 +221,8 @@ uv run pytest
 # Run with more verbosity
 uv run pytest -v
 
-# Run a specific test
-uv run pytest tests/test_climate_data.py::test_init_with_default_path
-
-# Run tests from a specific file
-uv run pytest tests/test_climate_data.py
-
 # Run tests with coverage (minimum threshold 80%)
 uv run test-cov
-```
-
-#### Test coverage
-
-- **`uv run test-cov`**: Runs tests with coverage and generates reports:
-  - Terminal report with uncovered lines
-  - HTML report in `htmlcov/index.html`
-  - **Minimum threshold**: 80% (tests will fail if coverage is lower)
-
-```bash
-# macOS
-open htmlcov/index.html
-
-# Linux
-xdg-open htmlcov/index.html
 ```
 
 ### Refresh station metadata
@@ -486,13 +243,6 @@ committing the refreshed CSV.
 ### Linting and formatting
 
 ```bash
-# Check code (linting)
-uv run ruff check .
-
-# Format code
-uv run ruff format .
-
-# Check and format in one step
 uv run ruff check . --fix
 uv run ruff format .
 ```
@@ -500,66 +250,176 @@ uv run ruff format .
 ### Update dependencies
 
 ```bash
-# Update all dependencies to the latest compatible versions
-uv lock --upgrade
-
-# Sync environment with new versions
-uv sync --all-extras
+uv lock --upgrade && uv sync --all-extras
 ```
 
-### Install in development mode
+## SINCA internals
+
+[SINCA](https://sinca.mma.gob.cl/) does not expose a documented public API. The
+following documents how the library accesses its data, discovered via browser DevTools
+inspection of the interactive map at `https://sinca.mma.gob.cl/mapainteractivo/index.html`.
+
+### Backend architecture
+
+SINCA runs on **Airviro**, a commercial air quality monitoring platform developed by
+IVL Swedish Environmental Research Institute (Sweden). The backend is a CGI (Common
+Gateway Interface) system running on Apache/Linux, with data stored in a structured
+filesystem:
+
+```
+/usr/airviro/data/CONAMA/
+└── {REGION}/{STATION_KEY}/
+    ├── Cal/    # Calibrated pollutant measurements
+    └── Met/    # Meteorological measurements
+```
+
+### Station metadata discovery
+
+The station list is loaded dynamically by the interactive map. Inspecting the network
+traffic reveals the JavaScript bundle `mapa.js`, which hardcodes the station list endpoint:
+
+```javascript
+// mapa.js
+var g = { listado: "//sinca.mma.gob.cl/index.php/json/listadomapa2k19/" };
+```
+
+This endpoint returns a JSON array where each object represents a station:
+
+```json
+{
+  "nombre":      "Alto Hospicio",
+  "key":         "117",
+  "latitud":     -20.290466881209,
+  "longitud":    -70.100192427636,
+  "comuna":      "Alto Hospicio",
+  "red":         "Red MMA",
+  "region":      "Región de Tarapacá",
+  "regionindex": 2,
+  "calificacion": "Pública",
+  "empresa":     "Ministerio del Medio Ambiente",
+  "realtime":    [...]
+}
+```
+
+The `realtime` array contains the last 24 hours of readings and is not used for
+station metadata. The fields retained in `sinca_stations.csv` are:
+
+| JSON field | CSV column | Description |
+|---|---|---|
+| `nombre` | `station_name` | Human-readable station name |
+| `key` | `station_code` | Unique station identifier used in download URLs |
+| `latitud` | `latitude` | WGS84 (World Geodetic System 1984) latitude |
+| `longitud` | `longitude` | WGS84 longitude |
+| `comuna` | `city` | Municipality |
+| `region` | `region` | Administrative region (roman numeral: `I`, `II`, ... `RM`) |
+| `red` | `network` | Monitoring network name |
+| `regionindex` | `region_index` | Numeric region index |
+| `calificacion` | `access_type` | Access classification (`Pública` / `Privada`) |
+| `empresa` | `operator` | Operating organization |
+
+### Parameter code discovery
+
+The same `mapa.js` reveals the parameter codes used throughout SINCA, hardcoded in a
+`switch` statement that maps internal codes to display labels:
+
+```javascript
+switch (e.realtime[T].code) {
+  case "PM10":  B = "MP 10";                break;
+  case "PM25":  B = "MP 2.5";              break;
+  case "0001":  B = "Dióxido de azufre";   break;
+  case "0003":  B = "Dióxido de nitrógeno"; break;
+  case "0004":  B = "Monóxido de carbono"; break;
+  case "0008":  B = "Ozono";               break;
+}
+```
+
+These codes map directly to filesystem paths in the download endpoint. Meteorological
+parameters (`temp`, `RH`, `ws`, `wd`) do not appear in `mapa.js` — their paths were
+discovered empirically by probing the CGI endpoint.
+
+### Data download endpoint
+
+All historical data is served by a single public CGI endpoint with no authentication
+required. The URL is constructed as:
+
+```
+https://sinca.mma.gob.cl/cgi-bin/APUB-MMA/apub.tsindico2.cgi
+  ?outtype=xcl
+  &macro=./{STATION_CODE}{PARAMETER_PATH}from={YYMMDD}&to={YYMMDD}
+  &path=/usr/airviro/data/CONAMA/
+  &lang=esp&rsrc=&macropath=
+```
+
+The full set of parameter paths, as used by this library:
+
+| Parameter | Type | Path |
+|---|---|---|
+| `PM10` | Pollutant | `/Cal/PM10//PM10.horario.horario.ic&` |
+| `PM25` | Pollutant | `/Cal/PM25//PM25.horario.horario.ic&` |
+| `SO2` | Pollutant | `/Cal/0001//0001.horario.horario.ic&` |
+| `NO` | Pollutant | `/Cal/0002//0002.horario.horario.ic&` |
+| `NO2` | Pollutant | `/Cal/0003//0003.horario.horario.ic&` |
+| `CO` | Pollutant | `/Cal/0004//0004.horario.horario.ic&` |
+| `O3` | Pollutant | `/Cal/0008//0008.horario.horario.ic&` |
+| `NOX` | Pollutant | `/Cal/0NOX//0NOX.horario.horario.ic&` |
+| `temp` | Meteorological | `/Met/TEMP//horario_000.ic&` (alt: `horario_010.ic&`) |
+| `RH` | Meteorological | `/Met/RHUM//horario_000.ic&` (alt: `horario_002.ic&`) |
+| `ws` | Meteorological | `/Met/WSPD//horario_000.ic&` (alt: `horario_010.ic&`) |
+| `wd` | Meteorological | `/Met/WDIR//horario_000_spec.ic&` (alt: `horario_010_spec.ic&`) |
+
+Meteorological parameters have an alternative path tried automatically when the
+primary returns no data. The date parameters use 6-digit format: `YYMMDD` (e.g.,
+`200101` for January 1st, 2020).
+
+**Example** — PM10 from Parque O'Higgins (`RM/D14`), January 2020:
+
+```
+https://sinca.mma.gob.cl/cgi-bin/APUB-MMA/apub.tsindico2.cgi?outtype=xcl&macro=./RM/D14/Cal/PM10//PM10.horario.horario.ic&from=200101&to=200131&path=/usr/airviro/data/CONAMA/&lang=esp&rsrc=&macropath=
+```
+
+### Response format
+
+The endpoint returns a semicolon-delimited CSV with hourly records and three
+validation columns in priority order:
+
+| Column | Description |
+|---|---|
+| `FECHA (YYMMDD)` | Date in `YYMMDD` format |
+| `HORA (HHMM)` | Time in `HHMM` format |
+| `Registros validados` | Operationally validated values (highest priority) |
+| `Registros preliminares` | Preliminary values |
+| `Registros no validados` | Raw, unvalidated values (lowest priority) |
+
+The library coalesces these three columns left-to-right, taking the first non-null
+value per row.
+
+### Station metadata (`sinca_stations.csv`)
+
+The file `src/atmchile/data/sinca_stations.csv` is the **source of truth** for SINCA
+station metadata used by this library. It contains 118 stations across 22 monitoring
+networks, with columns: `city`, `station_code`, `latitude`, `longitude`,
+`station_name`, `region`, `network`, `region_index`, `access_type`, `operator`.
+
+This file is kept up to date by running:
 
 ```bash
-# The project is already in editable mode with uv sync
-# If you need to reinstall:
-uv pip install -e .
+uv run refresh-stations
 ```
 
-### Project Structure
-
-```
-atmchile/
-├── src/atmchile/
-│   ├── __init__.py
-│   ├── climate_data.py        # Main ChileClimateData class
-│   ├── air_quality_data.py    # Main ChileAirQuality class
-│   ├── scripts.py             # Utility scripts
-│   ├── utils.py               # Utilities
-│   └── data/
-│       ├── dmc_stations.csv   # Meteorological stations table
-│       └── sinca_stations.csv # SINCA air quality stations table
-├── tests/
-│   ├── test_air_quality.py       # Tests for ChileAirQuality
-│   ├── test_air_quality_async.py # Tests for async ChileAirQuality
-│   ├── test_climate_data.py      # Tests for ChileClimateData
-│   └── test_utils.py             # Tests for utilities
-├── example_usage.py          # Usage examples
-├── pyproject.toml            # Project configuration and dependencies
-├── uv.lock                   # Dependency lockfile (generated by uv)
-├── README.md
-└── LICENSE
-```
-
-### Dependencies
-
-#### Main dependencies (runtime)
-
-- `numpy>=1.26.0` - Numerical operations
-- `pandas>=2.2.0` - Data manipulation
-- `requests>=2.28.0` - Synchronous HTTP client
-- `httpx>=0.23.0` - Asynchronous HTTP client
-
-#### Development dependencies
-
-- `ruff>=0.14.0` - Linter and formatter
-- `pytest>=7.0.0` - Testing framework
-- `pytest-asyncio>=0.23.0` - Support for async tests
-- `pytest-cov>=4.1.0` - pytest plugin for measuring code coverage
+> **Note:** The endpoint name (`listadomapa2k19`) and the parameter codes were
+> discovered via source inspection and are not officially documented by MMA. Both
+> are subject to change in future SINCA updates.
 
 ## Attribution & AI Disclosure
 
 This library is a Python port of the [AtmChile R package](https://github.com/franciscoxaxo/AtmChile)
-by Francisco Menares et al., developed at the Universidad de Chile under FONDECYT Project 1200674.
+by Francisco Menares et al., developed at the Department of Chemistry, Faculty of Sciences,
+Universidad de Chile. The original work was funded by ANID/FONDECYT Grant No. 1200674
+(Fondo Nacional de Desarrollo Científico y Tecnológico, Chile's national research funding agency).
+
+The original package is described in:
+
+> Menares et al. (2022). [The AtmChile Open-Source Interactive Application for Exploring Air Quality and Meteorological Data in Chile](https://www.mdpi.com/2073-4433/13/9/1364). *Atmosphere*, 13(9), 1364.
 
 The initial R-to-Python port was generated with the assistance of **Claude (Anthropic) AI**.
 Subsequent architecture decisions, testing, and incremental improvements were made by the author.
