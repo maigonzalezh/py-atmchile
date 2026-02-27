@@ -7,6 +7,7 @@ Tocopilla,RII/230,-22.111064,-70.210828,Bomberos,II,Ciudad Tocopilla,3,Privada,N
 Tocopilla,RII/231,-22.060287005823,-70.187401439495,Tres Marias,II,Ciudad Tocopilla,3,Privada,Norgener S.A
 Calama,RII/233,-22.460270722943,-68.937706917007,Club Deportivo 23 de Marzo,II,Ciudad Calama,3,Privada,Codelco Distrito Norte
 Calama,RII/234,-22.464835957564,-68.920969963074,Oasis,II,,3,Privada,Codelco Distrito Norte
+Calama,RII/235,-22.44283906304,-68.932546346863,Colegio Pedro Vergara Keller,II,Ciudad Calama,3,Privada,Codelco Distrito Norte
 Antofagasta,RII/237,-23.61354215815,-70.383315682411,Antofagasta,II,Red MMA,3,Pública,Ministerio del Medio Ambiente
 Tocopilla,RII/251,-22.085864134728,-70.188415616234,Super Site,II,Ciudad Tocopilla,3,Privada,ENGIE Energia Chile S.A.
 Calama,RII/253,-22.342971402789,-68.648661344727,Nueva ChiuChiu,II,Ciudad Calama,3,Privada,Codelco Distrito Norte
@@ -26,7 +27,6 @@ Chañaral,RIII/334,-26.335751545006,-70.612341660763,Chañaral,III,Red MMA,4,Pú
 Andacollo,RIV/411,-30.255042,-71.084707,Chepiquilla,IV,Minera Teck,5,Privada,Compañía Minera Teck Carmen de Andacollo
 Andacollo,RIV/415,-30.239515,-71.085853,Urmeneta - Plaza Centenario,IV,Minera Teck,5,Privada,Compañía Minera Teck Carmen de Andacollo
 Andacollo,RIV/420,-30.227767752117,-71.086126833637,Andacollo,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
-Salamanca,RIV/424,-31.889278312544,-70.629311769684,Cuncumen ,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
 Coquimbo,RIV/425,-29.933006518748,-71.261966365967,La Serena,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
 Coquimbo,RIV/426,-29.970390235273,-71.336038250122,Coquimbo,IV,Red MMA,5,Pública,Ministerio del Medio Ambiente
 Puchuncaví,RV/501,-32.736065,-71.450827,Campiche,V,Puerto Ventanas,6,Privada,Puerto Ventanas S.A
@@ -121,3 +121,4 @@ Cerrillos,RM/D35,-33.495361139755,-70.704821317871,Cerrillos II,RM,MACAM - Metro
 Valdivia,RXIV/E03,-39.831316104673,-73.22851282209,Valdivia,XIV,Red MMA,12,Pública,Ministerio del Medio Ambiente
 La Unión,RXIV/E04,-40.286857441758,-73.076710459412,La Union,XIV,Red MMA,12,Pública,Ministerio del Medio Ambiente
 Valdivia,RXIV/E08,-39.810654596299,-73.21969804116,Valdivia 2,XIV,Red MMA,12,Pública,Ministerio del Medio Ambiente
+Arica,RXV/F01,-18.47683929771,-70.287911433372,Arica,XV,Red MMA,1,Pública,Ministerio del Medio Ambiente
