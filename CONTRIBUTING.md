@@ -10,7 +10,7 @@
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and set up
-git clone <repository-url>
+git clone https://github.com/maigonzalezh/py-atmchile.git
 cd atmchile
 uv sync --group dev
 ```
@@ -35,6 +35,21 @@ uv run test-cov
 ```
 
 Coverage reports are written to `htmlcov/index.html`.
+
+### Integration tests
+
+Integration tests hit the live SINCA and DMC endpoints and are excluded from
+the default run. Run them manually when you have network access:
+
+```bash
+# Run all integration tests
+uv run pytest -m integration -v
+
+# Run a single integration test
+uv run pytest tests/test_integration.py::test_integration_air_quality_get_data -v
+```
+
+Tests skip automatically if the endpoint is unreachable.
 
 ## Linting and formatting
 
