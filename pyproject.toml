@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "atmchile"
-version = "0.1.1"
+version = "0.2.0"
 description = "Python library to obtain climate and air quality data from monitoring stations in Chile"
 keywords = ["Chile", "climate", "air-quality", "SINCA", "pandas", "meteorology"]
 readme = "README.md"
@@ -14,7 +14,7 @@ authors = [
     {name = "Marcelo González", email = "maigonzalezh@users.noreply.github.com"},
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3",

@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-02-27
+
+### Changed
+- Refactor exception handling for consistency between `ChileAirQuality` and
+  `ChileClimateData`: both classes now catch station-level errors uniformly,
+  preventing unexpected exceptions from propagating to callers
+- Migrate all `print()` calls to Python `logging` module, enabling users to
+  control verbosity via standard logging configuration
+- Eliminate silent exception swallowing in `ChileClimateData._process_year_data()`;
+  errors are now logged before returning `None`
+- Remove raise-to-catch anti-pattern in `ChileClimateData._download_parameter()`
+
+### Added
+- Monthly automatic station data refresh workflow (`refresh-stations.yml`):
+  fetches live SINCA station list on the 1st of each month and opens a PR if
+  changes are detected
+- 7 new tests covering error handling and logging paths
+
+### Fixed
+- Rewrite date string concatenation in climate data to avoid `pandas-stubs`
+  version skew (`str(year) + ...` instead of `pd.Series` concat)
+
+### CI
+- Enable mypy strict mode with dedicated CI job (`typecheck`)
+- Align coverage threshold to 90% minimum
+
+### Docs
+- Extract SINCA internals and output column reference to `docs/` directory,
+  keeping README focused on usage
+
+### Data
+- Refresh `sinca_stations.csv` with latest 122 stations from SINCA
+
 ## [0.1.1] - 2026-02-27
 
 ### Fixed
