@@ -17,7 +17,7 @@ from atmchile.utils import convert_str_to_list, load_package_csv
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
-else:
+else:  # pragma: no cover
     from enum import Enum
 
     class StrEnum(str, Enum):  # type: ignore[no-redef]
