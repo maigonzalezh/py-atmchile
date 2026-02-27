@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "atmchile"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python library to obtain climate and air quality data from monitoring stations in Chile"
 keywords = ["Chile", "climate", "air-quality", "SINCA", "pandas", "meteorology"]
 readme = "README.md"
