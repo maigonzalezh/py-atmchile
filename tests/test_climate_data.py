@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import io
+import logging
 import zipfile
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
@@ -847,3 +848,126 @@ def test_validate_request_end_is_now(climate_data_instance: ChileClimateData) ->
         end=dt_cls.now(),
     )
     assert end >= start
+
+
+# ---------------------------------------------------------------------------
+# Exception handling / logging tests
+# ---------------------------------------------------------------------------
+
+
+def test_process_year_data_returns_none_on_invalid_zip_bytes(
+    climate_data_instance: ChileClimateData,
+):
+    """Garbage bytes → _process_year_data returns None."""
+    result = climate_data_instance._process_year_data(
+        b"not-a-zip-file",
+        "180005_2020_Temperatura_.csv",
+        datetime(2020, 1, 1),
+        datetime(2020, 1, 2),
+    )
+    assert result is None
+
+
+def test_process_year_data_returns_none_when_csv_not_in_zip(
+    climate_data_instance: ChileClimateData,
+):
+    """Valid ZIP but expected CSV is absent → None."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("wrong_name.csv", "col1;col2\n1;2\n")
+
+    result = climate_data_instance._process_year_data(
+        buf.getvalue(),
+        "180005_2020_Temperatura_.csv",
+        datetime(2020, 1, 1),
+        datetime(2020, 1, 2),
+    )
+    assert result is None
+
+
+def test_process_year_data_returns_none_when_instante_column_missing(
+    climate_data_instance: ChileClimateData,
+):
+    """ZIP with CSV that lacks the 'Instante' column → None."""
+    csvname = "180005_2020_Temperatura_.csv"
+    csv_content = "NotInstante;Ts\n2020-01-01 00:00:00;15.0\n"
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr(csvname, csv_content)
+
+    result = climate_data_instance._process_year_data(
+        buf.getvalue(),
+        csvname,
+        datetime(2020, 1, 1),
+        datetime(2020, 1, 2),
+    )
+    assert result is None
+
+
+@patch("atmchile.climate_data.requests.get")
+def test_download_parameter_returns_download_error_when_process_year_returns_none(
+    mock_get,
+    climate_data_instance: ChileClimateData,
+):
+    """Network OK but parse fails → NaN data + DOWNLOAD_ERROR status."""
+    start = datetime(2020, 1, 1, 0, 0, 0)
+    end = datetime(2020, 1, 1, 5, 0, 0)
+
+    response = MagicMock()
+    response.content = b"not-a-zip"
+    response.raise_for_status = MagicMock()
+    mock_get.return_value = response
+
+    df = climate_data_instance._download_parameter(
+        station_code="180005",
+        parameter="Temperatura",
+        start_datetime=start,
+        end_datetime=end,
+    )
+
+    assert not df.empty
+    assert df["Ts"].isna().all()
+    assert (df["dl.Ts"] == ClimateDownloadStatus.DOWNLOAD_ERROR).all()
+
+
+@patch("atmchile.climate_data.requests.get")
+def test_get_data_skips_station_on_unexpected_error(
+    mock_get,
+    climate_data_instance: ChileClimateData,
+    single_day_range,
+):
+    """_combine_parameters raises RuntimeError → get_data() skips station, returns empty."""
+    start, end = single_day_range
+
+    with patch.object(
+        ChileClimateData,
+        "_combine_parameters",
+        side_effect=RuntimeError("unexpected"),
+    ):
+        df = climate_data_instance.get_data(
+            stations="180005",
+            parameters="Temperatura",
+            start=start,
+            end=end,
+        )
+
+    assert df.empty
+
+
+def test_process_year_data_logs_warning_on_failure(
+    climate_data_instance: ChileClimateData,
+    caplog,
+):
+    """Invalid ZIP → logger.warning is emitted with the CSV name."""
+    csvname = "180005_2020_Temperatura_.csv"
+
+    with caplog.at_level(logging.WARNING, logger="atmchile.climate_data"):
+        result = climate_data_instance._process_year_data(
+            b"garbage",
+            csvname,
+            datetime(2020, 1, 1),
+            datetime(2020, 1, 2),
+        )
+
+    assert result is None
+    assert any(csvname in record.message for record in caplog.records)

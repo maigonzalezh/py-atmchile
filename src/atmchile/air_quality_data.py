@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import io
+import logging
 import os
 import sys
 from datetime import datetime
@@ -21,6 +22,8 @@ import pandas as pd
 import requests
 
 from atmchile.utils import convert_str_to_list, load_package_csv
+
+logger = logging.getLogger(__name__)
 
 
 class AirQualityDownloadStatus(StrEnum):
@@ -338,11 +341,11 @@ class ChileAirQuality:
                         dataframes_list.append(station_data)
 
                     except Exception as e:
-                        print(f"Error processing station {station}: {e}")
+                        logger.warning("Error processing station %s: %s", station, e)
                         continue
 
             except Exception as e:
-                print(f"Error searching for station {station}: {e}")
+                logger.warning("Error searching for station %s: %s", station, e)
                 continue
 
         if dataframes_list:
@@ -358,7 +361,7 @@ class ChileAirQuality:
             total_data = self._convert_numeric_columns(total_data)
             total_data["date"] = pd.to_datetime(total_data["date"], format=self.SINCA_DATE_FORMAT)
 
-        print("Data Captured!")
+        logger.info("Data Captured!")
         return total_data
 
     async def get_data_async(
@@ -483,11 +486,11 @@ class ChileAirQuality:
                         dataframes_list.append(station_data)
 
                     except Exception as e:
-                        print(f"Error processing station {station}: {e}")
+                        logger.warning("Error processing station %s: %s", station, e)
                         continue
 
             except Exception as e:
-                print(f"Error searching for station {station}: {e}")
+                logger.warning("Error searching for station %s: %s", station, e)
                 continue
 
         if dataframes_list:
@@ -503,7 +506,7 @@ class ChileAirQuality:
             total_data = self._convert_numeric_columns(total_data)
             total_data["date"] = pd.to_datetime(total_data["date"], format=self.SINCA_DATE_FORMAT)
 
-        print("Data Captured!")
+        logger.info("Data Captured!")
         return total_data
 
     def _create_station_dataframe(
@@ -563,7 +566,7 @@ class ChileAirQuality:
             DataFrame with all parameters combined
         """
         for parameter in parameters_list:
-            print(f"Downloading {parameter} for {station_name}")
+            logger.debug("Downloading %s for %s", parameter, station_name)
             param_data = self._download_parameter(
                 station_code=station_code,
                 parameter=parameter,
@@ -630,7 +633,9 @@ class ChileAirQuality:
         # Combine results into station DataFrame
         for parameter, param_data in zip(parameters_list, parameter_results):
             if isinstance(param_data, BaseException):
-                print(f"Error downloading {parameter} for {station_name}: {param_data}")
+                logger.warning(
+                    "Error downloading %s for %s: %s", parameter, station_name, param_data
+                )
                 # Create empty DataFrame for this parameter
                 param_data = self._create_empty_parameter_dataframe(
                     parameter, start_datetime, end_datetime
@@ -640,7 +645,7 @@ class ChileAirQuality:
                     param_data, left_on="date", right_on="date", how="left"
                 )
             else:
-                print(f"No data found for {parameter} for {station_name}")
+                logger.info("No data found for %s for %s", parameter, station_name)
 
         return station_data
 
@@ -765,7 +770,7 @@ class ChileAirQuality:
             dates = date_part.str.cat([time_part], sep=" ")
             return dates.fillna("").astype(str)
         except Exception as e:
-            print(f"  Error processing date/time: {e}")
+            logger.warning("Error processing date/time: %s", e)
             return pd.Series([""] * len(df), dtype=str)
 
     def _download_parameter(
@@ -797,7 +802,7 @@ class ChileAirQuality:
 
         for url in urls_to_try:
             try:
-                print(f"  URL: {url}")
+                logger.debug("URL: %s", url)
                 response = requests.get(url, timeout=30)
                 response.raise_for_status()
 
@@ -814,7 +819,7 @@ class ChileAirQuality:
                 return self._process_parameter_data(df, parameter, st)
 
             except Exception as e:
-                print(f"  Error: {e}")
+                logger.warning("Error: %s", e)
                 if url == urls_to_try[-1]:  # Last URL
                     return self._create_empty_parameter_dataframe(
                         parameter, start_datetime, end_datetime
@@ -846,7 +851,7 @@ class ChileAirQuality:
                 response.raise_for_status()
                 return response.content
             except Exception as e:
-                print(f"  Error downloading URL: {e}")
+                logger.warning("Error downloading URL: %s", e)
                 return None
 
     async def _download_parameter_async(
@@ -904,7 +909,7 @@ class ChileAirQuality:
 
                 return self._process_parameter_data(df, parameter, st)
             except Exception as e:
-                print(f"  Error processing data: {e}")
+                logger.warning("Error processing data: %s", e)
                 if url == urls_to_try[-1]:  # Last URL
                     return self._create_empty_parameter_dataframe(
                         parameter, start_datetime, end_datetime
@@ -1043,9 +1048,9 @@ class ChileAirQuality:
                 ) > (pd.to_numeric(df_curated["NOX"], errors="coerce") * 1.001)
 
                 _mark_curated(mask, ["NO", "NO2", "NOX"])
-                print("  NOX curation applied")
+                logger.debug("NOX curation applied")
             except Exception as e:
-                print(f"  Error in NOX curation: {e}")
+                logger.warning("Error in NOX curation: %s", e)
 
         # Particulate matter
         if all(col in df_curated.columns for col in ["PM25", "PM10"]):
@@ -1055,9 +1060,9 @@ class ChileAirQuality:
                 )
 
                 _mark_curated(mask, ["PM10", "PM25"])
-                print("  PM curation applied")
+                logger.debug("PM curation applied")
             except Exception as e:
-                print(f"  Error in PM curation: {e}")
+                logger.warning("Error in PM curation: %s", e)
 
         # Wind direction
         if "wd" in df_curated.columns:
@@ -1065,9 +1070,9 @@ class ChileAirQuality:
                 wd_numeric = pd.to_numeric(df_curated["wd"], errors="coerce")
                 mask = (wd_numeric > 360) | (wd_numeric < 0)
                 _mark_curated(mask, ["wd"])
-                print("  Wind direction curation applied")
+                logger.debug("Wind direction curation applied")
             except Exception as e:
-                print(f"  Error in wd curation: {e}")
+                logger.warning("Error in wd curation: %s", e)
 
         # Relative humidity
         if "RH" in df_curated.columns:
@@ -1075,8 +1080,8 @@ class ChileAirQuality:
                 rh_numeric = pd.to_numeric(df_curated["RH"], errors="coerce")
                 mask = (rh_numeric > 100) | (rh_numeric < 0)
                 _mark_curated(mask, ["RH"])
-                print("  Relative humidity curation applied")
+                logger.debug("Relative humidity curation applied")
             except Exception as e:
-                print(f"  Error in RH curation: {e}")
+                logger.warning("Error in RH curation: %s", e)
 
         return df_curated

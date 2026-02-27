@@ -10,7 +10,7 @@ import pandas as pd
 import pytest
 import requests
 
-from atmchile.air_quality_data import ChileAirQuality
+from atmchile.air_quality_data import AirQualityDownloadStatus, ChileAirQuality
 
 
 @pytest.fixture
@@ -981,3 +981,43 @@ async def test_get_data_async_handles_parameter_download_exception(
     )
 
     assert isinstance(result, pd.DataFrame)
+
+
+@pytest.mark.asyncio
+async def test_download_parameter_async_returns_download_error_for_incomplete_csv(
+    air_quality_instance: ChileAirQuality,
+    date_range,
+):
+    """CSV with < 2 columns in async path → DOWNLOAD_ERROR."""
+    start, end = date_range
+
+    class SingleColumnClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return False
+
+        async def get(self, url: str):
+            response = MagicMock()
+            response.content = b"only_one_column\nvalue1\nvalue2\n"
+            response.raise_for_status = MagicMock()
+            return response
+
+    with patch(
+        "atmchile.air_quality_data.httpx.AsyncClient",
+        return_value=SingleColumnClient(),
+    ):
+        df = await air_quality_instance.get_data_async(
+            stations="RM/D14",
+            parameters="PM10",
+            start=start,
+            end=end,
+            curate=False,
+            st=False,
+        )
+
+    assert isinstance(df, pd.DataFrame)
+    assert not df.empty
+    assert "dl.PM10" in df.columns
+    assert (df["dl.PM10"] == AirQualityDownloadStatus.DOWNLOAD_ERROR).any()
