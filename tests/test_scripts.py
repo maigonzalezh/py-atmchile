@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import csv
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 import requests as req
 
-from atmchile.scripts import _build_station_code, refresh_stations
+from atmchile.scripts import CSV_COLUMNS, _build_station_code, refresh_stations
 
 # ---------------------------------------------------------------------------
 # _build_station_code (pure function)
@@ -51,7 +52,19 @@ def test_refresh_stations_writes_csv(
         }
     ]
     refresh_stations()
-    assert (tmp_path / "sinca_stations.csv").exists()
+
+    csv_path = tmp_path / "sinca_stations.csv"
+    assert csv_path.exists()
+
+    with csv_path.open(encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+
+    assert reader.fieldnames == CSV_COLUMNS
+    assert len(rows) == 1
+    assert rows[0]["city"] == "Coquimbo"
+    assert rows[0]["station_code"] == "RIV/001"
+    assert rows[0]["region"] == "IV"
 
 
 # ---------------------------------------------------------------------------
