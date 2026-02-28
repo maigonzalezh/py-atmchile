@@ -3,6 +3,7 @@
 ![CI](https://github.com/maigonzalezh/py-atmchile/actions/workflows/ci.yml/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/atmchile)](https://pypi.org/project/atmchile/)
 [![Python](https://img.shields.io/pypi/pyversions/atmchile)](https://pypi.org/project/atmchile/)
+[![codecov](https://codecov.io/gh/maigonzalezh/py-atmchile/graph/badge.svg)](https://codecov.io/gh/maigonzalezh/py-atmchile)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/maigonzalezh/py-atmchile/blob/main/examples/atmchile_usage_guide.ipynb)
 
 Python library to download air quality and climate data from two Chilean government monitoring
