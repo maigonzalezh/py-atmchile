@@ -30,7 +30,7 @@ uv run pytest tests/test_climate_data.py
 # Single test
 uv run pytest tests/test_climate_data.py::test_init_with_default_path
 
-# With coverage (minimum threshold: 80%)
+# With coverage
 uv run test-cov
 ```
 

@@ -25,7 +25,7 @@ from atmchile import ChileAirQuality
 
 caq = ChileAirQuality()
 df = caq.get_data(
-    stations="El Bosque",
+    stations="RM/D14",
     parameters=["PM10", "PM25"],
     start=datetime(2020, 1, 1),
     end=datetime(2020, 1, 31),
