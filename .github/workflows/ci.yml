@@ -45,7 +45,11 @@ jobs:
           enable-cache: true
           python-version: "3.9"
       - run: uv sync --group dev
-      - run: uv run pytest --cov --cov-fail-under=90
+      - run: uv run pytest --cov --cov-report=xml --cov-fail-under=90
+      - uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_if_error: true
 
   audit:
     name: Security audit
