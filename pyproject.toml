@@ -51,6 +51,7 @@ refresh-stations = "atmchile.scripts:refresh_stations"
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = [
