@@ -51,6 +51,7 @@ REGION_MAP: dict[str, str] = {
     "Región de Aysén del General Carlos Ibáñez del Campo": "XI",
     "Región Aysén del General Carlos Ibáñez del Campo": "XI",  # alias without "de"
     "Región de Magallanes y de la Antártica Chilena": "XII",
+    "Región de Magallanes y Antártica Chilena": "XII",  # alias without "de la"
 }
 
 
