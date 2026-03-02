@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2026-03-01
+
+### Fixed
+- Add missing `"Región de Magallanes y Antártica Chilena"` alias in `REGION_MAP`,
+  fixing Punta Arenas station being written with `region=UNKNOWN`
+
+### Data
+- Refresh `sinca_stations.csv` with latest station data from SINCA
+
+### Docs
+- Add Colab usage guide notebook and badge
+- Fix incorrect facts in documentation
+
+### CI
+- Integrate Codecov for test coverage reporting
+- Exclude Jupyter notebooks from ruff linting
+
 ## [0.2.0] - 2026-02-27
 
 ### Changed
