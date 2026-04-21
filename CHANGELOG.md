@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-04-21
+
+### Security
+- Add Sigstore-backed build provenance attestations via
+  `actions/attest-build-provenance@v4` in the publish workflow. Every published
+  artifact is now verifiable with
+  `gh attestation verify <file> --repo maigonzalezh/py-atmchile`.
+- Explicitly enable PEP 740 attestations on PyPI and TestPyPI uploads
+  (`pypa/gh-action-pypi-publish` with `attestations: true`), surfacing the
+  "attested" indicator on the PyPI project page.
+
 ## [0.2.2] - 2026-04-21
 
 ### Security
