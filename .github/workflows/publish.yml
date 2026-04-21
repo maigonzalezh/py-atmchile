@@ -9,12 +9,20 @@ jobs:
   build:
     name: Build distribution
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v7
       - run: uv build
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: "dist/*"
       - uses: actions/upload-artifact@v7
         with:
           name: dist
@@ -35,6 +43,7 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          attestations: true
 
   publish-pypi:
     name: Publish to PyPI
@@ -49,6 +58,8 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: true
 
   github-release:
     name: Create GitHub Release
