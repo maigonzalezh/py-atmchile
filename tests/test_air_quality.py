@@ -332,8 +332,8 @@ def test_convert_numeric_columns_skips_metadata_and_lineage(air_quality_instance
 
     converted = air_quality_instance._convert_numeric_columns(df.copy())
     assert converted["PM10"].dtype.kind in {"i", "f"}
-    assert converted["s.PM10"].dtype == object
-    assert converted["dl.PM10"].dtype == object
+    assert not pd.api.types.is_numeric_dtype(converted["s.PM10"])
+    assert not pd.api.types.is_numeric_dtype(converted["dl.PM10"])
 
 
 def test_convert_numeric_columns_empty_returns_df(air_quality_instance: ChileAirQuality):

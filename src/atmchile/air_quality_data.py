@@ -979,9 +979,11 @@ class ChileAirQuality:
 
         dl_col = f"dl.{parameter}"
         result_df[dl_col] = result_df[parameter].apply(
-            lambda v: AirQualityDownloadStatus.OK
-            if str(v).strip() != ""
-            else AirQualityDownloadStatus.EMPTY
+            lambda v: (
+                AirQualityDownloadStatus.OK
+                if str(v).strip() != ""
+                else AirQualityDownloadStatus.EMPTY
+            )
         )
 
         return result_df

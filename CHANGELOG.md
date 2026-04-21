@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Security
+- Upgrade `requests` to 2.33.1 (CVE-2026-25645), `pygments` to 2.20.0
+  (CVE-2026-4539), and `pytest` to 9.0.3 (CVE-2025-71176) to address
+  vulnerabilities flagged by `pip-audit` in CI
+- Refresh `uv.lock` with latest patch versions of transitive dependencies
+
 ## [0.2.1] - 2026-03-01
 
 ### Fixed
