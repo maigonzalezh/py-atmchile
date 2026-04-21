@@ -77,3 +77,20 @@ CI runs both checks on every push and pull request — make sure they pass local
 uv lock --upgrade   # upgrade lock file
 uv sync --group dev  # sync environment
 ```
+
+## Release workflow
+
+The package version is derived automatically from git tags via `hatch-vcs` —
+there is no `version` field in `pyproject.toml` to keep in sync.
+
+1. On a `release/vX.Y.Z` branch off `main`, rename `[Unreleased]` in
+   `CHANGELOG.md` to `[X.Y.Z] - YYYY-MM-DD` and open a PR against `main`.
+2. After the PR is merged, tag the merge commit and push:
+   ```bash
+   git checkout main && git pull
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+3. The `publish.yml` workflow picks up the tag, builds the distribution
+   (version computed from the tag), publishes to TestPyPI and PyPI, and
+   creates a GitHub Release.

@@ -65,6 +65,9 @@ venv.bak/
 *~
 .DS_Store
 
+# hatch-vcs generated version file
+src/atmchile/_version.py
+
 # Ruff
 .ruff_cache/
 
