@@ -40,7 +40,11 @@ jobs:
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@6733eb7d741f0b11ec6a39b58540dab7590f9b7d  # v1.14.0
+      # NOT SHA-pinned by design: this action builds a Docker image tagged with
+      # the action ref, and pypa publishes ghcr images per release tag, not per
+      # commit SHA. Pinning to a SHA yields `manifest unknown`. Pin to the
+      # release tag instead — the most specific immutable ref pypa publishes.
+      - uses: pypa/gh-action-pypi-publish@v1.14.0
         with:
           repository-url: https://test.pypi.org/legacy/
           attestations: true
@@ -57,7 +61,8 @@ jobs:
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@6733eb7d741f0b11ec6a39b58540dab7590f9b7d  # v1.14.0
+      # NOT SHA-pinned by design — see the note in the publish-testpypi job.
+      - uses: pypa/gh-action-pypi-publish@v1.14.0
         with:
           attestations: true
 

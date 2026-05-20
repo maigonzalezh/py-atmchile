@@ -7,8 +7,10 @@ All notable changes to this project will be documented in this file.
 ### Security
 - Upgrade `urllib3` to 2.7.0 (PYSEC-2026-141, PYSEC-2026-142) and `idna` to 3.15
   (CVE-2026-45409) to address vulnerabilities flagged by `pip-audit` in CI
-- Pin every GitHub Actions dependency to a full commit SHA across all workflows,
-  removing exposure to mutable-tag supply-chain attacks
+- Pin GitHub Actions dependencies to full commit SHAs across all workflows,
+  removing exposure to mutable-tag supply-chain attacks (`pypa/gh-action-pypi-publish`
+  stays on its release tag — it builds a Docker image keyed to the action ref and
+  has no per-commit image)
 - Add `.github/dependabot.yml` (weekly `pip` and `github-actions` updates, grouped,
   with a 7-day release cooldown) to keep dependencies and action pins current
 - Enforce a human review gate before production: pull requests required on `main`
