@@ -633,8 +633,10 @@ class ChileClimateData:
 
                     df["Instante"] = pd.to_datetime(df["Instante"])
                     mask = (df["Instante"] >= start_datetime) & (df["Instante"] <= end_datetime)
-                    df = df[mask]
-                    return df
+                    # Explicit annotation: pandas-stubs types df[bool_mask] as
+                    # Any on some versions and DataFrame on others.
+                    filtered: pd.DataFrame = df[mask]
+                    return filtered
         except Exception as e:
             logger.warning("Error processing %s: %s", csvname, e)
             return None
