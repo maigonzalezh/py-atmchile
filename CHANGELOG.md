@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.0] - 2026-05-20
+## [0.3.1] - 2026-05-20
 
 ### Security
 - Upgrade `urllib3` to 2.7.0 (PYSEC-2026-141, PYSEC-2026-142) and `idna` to 3.15
