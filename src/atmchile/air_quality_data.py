@@ -631,7 +631,7 @@ class ChileAirQuality:
             parameter_results = await asyncio.gather(*parameter_tasks, return_exceptions=True)
 
         # Combine results into station DataFrame
-        for parameter, param_data in zip(parameters_list, parameter_results):
+        for parameter, param_data in zip(parameters_list, parameter_results, strict=True):
             if isinstance(param_data, BaseException):
                 logger.warning(
                     "Error downloading %s for %s: %s", parameter, station_name, param_data
@@ -765,9 +765,11 @@ class ChileAirQuality:
             hour = time_series.str[:2]
             minute = time_series.str[2:4]
 
-            date_part = day.str.cat([month, year], sep="/")
-            time_part = hour.str.cat([minute], sep=":")
-            dates = date_part.str.cat([time_part], sep=" ")
+            # pandas-stubs types str.cat's list arg as list[str], but the runtime
+            # accepts a list of Series — hence the list-item ignores below.
+            date_part = day.str.cat([month, year], sep="/")  # type: ignore[list-item]
+            time_part = hour.str.cat([minute], sep=":")  # type: ignore[list-item]
+            dates = date_part.str.cat([time_part], sep=" ")  # type: ignore[list-item]
             return dates.fillna("").astype(str)
         except Exception as e:
             logger.warning("Error processing date/time: %s", e)

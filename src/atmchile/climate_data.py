@@ -483,7 +483,7 @@ class ChileClimateData:
             ]
             parameter_results = await asyncio.gather(*parameter_tasks, return_exceptions=True)
 
-        for parameter, param_df in zip(valid_params, parameter_results):
+        for parameter, param_df in zip(valid_params, parameter_results, strict=True):
             if isinstance(param_df, BaseException):
                 logger.warning("Error downloading %s: %s", parameter, param_df)
                 param_df = self._create_empty_dataframe(parameter, start_datetime, end_datetime)
@@ -572,7 +572,7 @@ class ChileClimateData:
         """
         year_dataframes = []
 
-        for year, result in zip(unique_years, year_results):
+        for year, result in zip(unique_years, year_results, strict=True):
             if isinstance(result, BaseException):
                 logger.warning("Error downloading %s for year %d: %s", parameter, year, result)
                 year_start, year_end = self._calculate_year_bounds(
@@ -633,7 +633,7 @@ class ChileClimateData:
 
                     df["Instante"] = pd.to_datetime(df["Instante"])
                     mask = (df["Instante"] >= start_datetime) & (df["Instante"] <= end_datetime)
-                    df = df[mask]  # type: ignore[assignment]  # pandas-stubs: df[bool_mask] -> DataFrame
+                    df = df[mask]
                     return df
         except Exception as e:
             logger.warning("Error processing %s: %s", csvname, e)

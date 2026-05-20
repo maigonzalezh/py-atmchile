@@ -2,7 +2,7 @@
 
 ## Environment requirements
 
-- Python >= 3.9
+- Python >= 3.10
 - [uv](https://github.com/astral-sh/uv)
 
 ```bash
@@ -64,6 +64,18 @@ uv run ruff format .
 
 CI runs both checks on every push and pull request — make sure they pass locally before opening a PR.
 
+## Definition of Ready — gate a producción
+
+Todo cambio que llega a producción pasa por una revisión humana obligatoria. No es
+opcional y está aplicado por configuración del repositorio:
+
+- **`main`**: no se permite push directo. Todo cambio entra por un pull request con
+  el CI en verde, revisado por un humano en la UI del PR antes de mergear. La regla
+  aplica también a administradores.
+- **Publicación (tag `v*`)**: el push del tag dispara `publish.yml`, pero los jobs de
+  publicación quedan **pausados** en los environments `pypi`/`testpypi` hasta que un
+  humano aprueba el deployment manualmente desde la pestaña Actions.
+
 ## Pull request workflow
 
 1. Fork the repository and create a feature branch from `main`.
@@ -91,6 +103,7 @@ there is no `version` field in `pyproject.toml` to keep in sync.
    git tag vX.Y.Z
    git push origin vX.Y.Z
    ```
-3. The `publish.yml` workflow picks up the tag, builds the distribution
-   (version computed from the tag), publishes to TestPyPI and PyPI, and
-   creates a GitHub Release.
+3. The `publish.yml` workflow picks up the tag and builds the distribution
+   (version computed from the tag). The publish jobs then **pause** on the
+   `testpypi` and `pypi` environments — approve the deployment manually from the
+   Actions tab to release to TestPyPI and PyPI and create the GitHub Release.
