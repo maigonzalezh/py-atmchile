@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2026-06-20
+
+### Data
+- Refresh `sinca_stations.csv` from SINCA: add Punta Arenas (`RXII/C05`) and
+  Huasco II (`RIII/329`); remove the decommissioned Tocopilla Super Site
+  (`RII/251`), Huasco SM4 (`RIII/304`), and Coquimbo (`RIV/426`) stations
+  (now 126 stations)
+
+### CI
+- Bump grouped GitHub Actions: `actions/checkout` 6.0.2 → 6.0.3,
+  `astral-sh/setup-uv` 8.1.0 → 8.2.0, `codecov/codecov-action` 6.0.1 → 7.0.0
+
 ## [0.3.1] - 2026-05-20
 
 ### Security
