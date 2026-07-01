@@ -12,12 +12,13 @@ Antofagasta,RII/237,-23.61354215815,-70.383315682411,Antofagasta,II,Red MMA,3,P�
 Mejillones,RII/252,-23.104878974525,-70.441385477264,Juan Jose Latorre,II,Red ENAEX,3,no definida,ENAEX S.A. Planta Prillex América
 Calama,RII/253,-22.342971402789,-68.648661344727,Nueva ChiuChiu,II,Ciudad Calama,3,Privada,Codelco Distrito Norte
 Huasco,RIII/301,-28.500572964292,-71.254313682556,SM1 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/302,-28.461865976957,-71.181390767212,SM2,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Huasco,RIII/303,-28.471972699163,-71.178309166023,SM3 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
+Huasco,RIII/304,-28.481300969425,-71.167198427408,SM4 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Huasco,RIII/305,-28.484485273511,-71.146118224884,SM5 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Freirina,RIII/306,-28.503649842345,-71.126531945122,SM6 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Freirina,RIII/307,-28.497964596656,-71.096081461655,SM7 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Freirina,RIII/308,-28.507409284386,-71.081571711987,SM8 ,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
-Huasco,RIII/309,-28.470340876399,-71.218828907093,EME M,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Huasco,RIII/310,-28.466423001884,-71.221554279327,EME F,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
 Huasco,RIII/329,-28.466498454912,-71.230636239723,Huasco II,III,CAP - Huasco,4,Privada,Compañia Minera del Pacifico
 Huasco,RIII/330,-28.467795302879,-71.22729152441,21 de Mayo,III,Red de Monitoreo Guacolda Valle del Huasco,4,Privada,GUACOLDA ENERGIA S.A.
@@ -110,7 +111,6 @@ Coyhaique,RXI/B03,-45.57996447948,-72.061125987766,Coyhaique,XI,Red MMA,14,Públ
 Coyhaique,RXI/B04,-45.579045667164,-72.049964505825,Coyhaique II,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
 Aysén,RXI/B05,-45.40680023471,-72.696259617805,Vialidad,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
 Cochrane,RXI/B06,-47.254803255147,-72.571392059326,Cochrane,XI,Red MMA,14,Pública,Ministerio del Medio Ambiente
-Punta Arenas,RXII/C05,-53.158295492238,-70.921497482453,Punta Arenas,XII,Red MMA,15,Pública,Ministerio del Medio Ambiente
 La Florida,RM/D12,-33.516630362266,-70.588123961971,La Florida (Acreditada),RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
 Las Condes,RM/D13,-33.37677352033,-70.523326784061,Las Condes (Acreditada),RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
 Santiago,RM/D14,-33.464142,-70.660797,Parque O'Higgins,RM,MACAM - Metropolitana,7,Pública,Ministerio del Medio Ambiente
